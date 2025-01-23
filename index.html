@@ -82,6 +82,13 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        .subjects h3, .students-success h3 {
+            background-color: #4285f4;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
         .subjects ul, .students-success ul {
             list-style-type: none;
             padding: 0;
@@ -92,14 +99,30 @@
         .subjects li, .students-success li {
             margin: 8px 0;
             padding-left: 20px;
-            position: relative;
         }
 
-        .subjects li::before, .students-success li::before {
-            content: "✔️";
-            position: absolute;
-            left: 0;
-            color: #4285f4;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        td {
+            background-color: #f7f8f9;
         }
 
         .testimonials blockquote {
@@ -157,14 +180,13 @@
                 <li><a href="admission.html">Admission</a></li>
                 <li><a href="scholarship.html">Scholarship</a></li>
                 <li><a href="resources.html">Resources</a></li>
-                <li><a href="contact.html">Contact</a></li>
             </ul>
         </nav>
     </header>
 
     <section>
         <h2>Welcome to Swarup Academy! 🎓</h2>
-        <p class="welcome-note">Here, we nurture young minds to build their future with knowledge and skills. Join us in this incredible journey of learning!</p>
+        <p class="welcome-note">At Swarup Academy, we strive to empower students with knowledge, creativity, and a passion for learning. Join us today to shape your bright future!</p>
 
         <div class="subjects">
             <h3>Subjects I Teach:</h3>
@@ -182,14 +204,54 @@
 
         <div class="students-success">
             <h3>Students Success List:</h3>
-            <ul>
-                <li>Aditya Pramanik (1st, Class 7): 92%</li>
-                <li>Sujan Pramanik (2nd, Class 8): 80%</li>
-                <li>Sristi Chakraborty (3rd, Class 8): 75%</li>
-                <li>Piyali Roy (2nd, Class 9): 88%</li>
-                <li>Sampa Tanti (3rd, Class 9): 82%</li>
-                <li>And many more to go...</li>
-            </ul>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Rank</th>
+                        <th>Class</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Aditya Pramanik</td>
+                        <td>1st</td>
+                        <td>Class 7</td>
+                        <td>92%</td>
+                    </tr>
+                    <tr>
+                        <td>Sujan Pramanik</td>
+                        <td>2nd</td>
+                        <td>Class 8</td>
+                        <td>80%</td>
+                    </tr>
+                    <tr>
+                        <td>Sristi Chakraborty</td>
+                        <td>3rd</td>
+                        <td>Class 8</td>
+                        <td>75%</td>
+                    </tr>
+                    <tr>
+                        <td>Piyali Roy</td>
+                        <td>2nd</td>
+                        <td>Class 9</td>
+                        <td>88%</td>
+                    </tr>
+                    <tr>
+                        <td>Sampa Tanti</td>
+                        <td>3rd</td>
+                        <td>Class 9</td>
+                        <td>82%</td>
+                    </tr>
+                    <tr>
+                        <td>And many more to go...</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="testimonials">
