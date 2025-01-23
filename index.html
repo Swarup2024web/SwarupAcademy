@@ -5,101 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swarup Academy - Home</title>
     <style>
-        /* Global styles */
+        /* Global Styles */
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #f7f8f9;
             color: #333;
         }
+
         header {
             background-color: #4285f4;
             color: white;
-            padding: 15px 0;
+            padding: 20px 0;
             text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         header h1 {
             margin: 0;
+            font-size: 32px;
         }
+
         header a {
             color: white;
             text-decoration: none;
         }
+
         nav ul {
             list-style-type: none;
             padding: 0;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 30px;
+            margin-top: 10px;
         }
+
         nav ul li {
             display: inline;
         }
+
         nav ul li a {
             color: white;
             text-decoration: none;
             font-size: 18px;
+            transition: color 0.3s;
         }
+
+        nav ul li a:hover {
+            color: #f4b400;
+        }
+
         section {
-            padding: 40px;
+            padding: 60px 20px;
             text-align: center;
         }
+
         section h2 {
+            font-size: 36px;
             color: #4285f4;
+            margin-bottom: 20px;
         }
-        footer {
-            background-color: #f1f1f1;
-            padding: 20px 0;
-            text-align: center;
-            font-family: 'Arial', sans-serif;
-            color: #555;
-            margin-top: 40px;
-            position: relative;
-        }
-        footer p {
-            margin: 0;
-            font-size: 16px;
-            font-weight: bold;
-            animation: textAnimation 5s infinite;
-        }
-        @keyframes textAnimation {
-            0% { color: #4285f4; }
-            25% { color: #db4437; }
-            50% { color: #f4b400; }
-            75% { color: #0f9d58; }
-            100% { color: #4285f4; }
-        }
+
         .welcome-note {
-            font-size: 22px;
+            font-size: 24px;
             color: #0f9d58;
+            font-weight: bold;
+            margin-bottom: 40px;
         }
+
         .subjects, .students-success, .testimonials {
-            margin-top: 30px;
+            margin-top: 40px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .subjects ul, .students-success ul {
             list-style-type: none;
             padding: 0;
-            font-size: 18px;
+            font-size: 20px;
+            line-height: 1.8;
         }
+
         .subjects li, .students-success li {
             margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
         }
+
+        .subjects li::before, .students-success li::before {
+            content: "✔️";
+            position: absolute;
+            left: 0;
+            color: #4285f4;
+        }
+
         .testimonials blockquote {
             font-style: italic;
-            font-size: 18px;
+            font-size: 22px;
             color: #db4437;
             margin-top: 20px;
+            padding-left: 40px;
+            border-left: 4px solid #db4437;
+            font-weight: 600;
         }
+
         .testimonials cite {
             display: block;
             margin-top: 10px;
             color: #4285f4;
             font-weight: bold;
         }
+
+        footer {
+            background-color: #4285f4;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 14px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        footer p a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: normal;
+        }
+
+        footer p a:hover {
+            color: #f4b400;
+        }
+
     </style>
 </head>
 <body>
+
     <header>
         <h1><a href="index.html">Swarup Academy</a></h1>
         <nav>
@@ -145,7 +195,7 @@
         <div class="testimonials">
             <h3>What Our Students Say:</h3>
             <blockquote>
-                "Swarup Sir's teaching methods are the best! I learned so much and always look forward to his classes!" 
+                "Swarup Sir's teaching methods are simply the best! I learned so much and always look forward to his classes!"
                 <cite>Aditya Pramanik, Class 7</cite>
             </blockquote>
             <blockquote>
@@ -156,7 +206,8 @@
     </section>
 
     <footer>
-        <p>Made with love by Swarup ❤️</p>
+        <p>Made with love by Swarup ❤️ | <a href="contact.html">Contact Us</a></p>
     </footer>
+
 </body>
 </html>
