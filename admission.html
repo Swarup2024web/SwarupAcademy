@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swarup Academy - Admission</title>
     <style>
+        /* Same global styles as index.html */
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #fff;
-            color: #333;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
         header {
             background-color: #4285f4;
@@ -48,12 +49,27 @@
             color: #4285f4;
         }
         footer {
-            background-color: #f8f8f8;
+            background-color: #f1f1f1;
             padding: 20px 0;
             text-align: center;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
+            font-family: 'Arial', sans-serif;
+            color: #555;
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            position: relative;
+        }
+        footer p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            animation: textAnimation 5s infinite;
+        }
+        @keyframes textAnimation {
+            0% { color: #4285f4; }
+            25% { color: #db4437; }
+            50% { color: #f4b400; }
+            75% { color: #0f9d58; }
+            100% { color: #4285f4; }
         }
     </style>
 </head>
@@ -71,11 +87,11 @@
     </header>
     <section>
         <h2>Admission Process</h2>
-        <p>Join Swarup Academy today and start your journey towards success! Our admission process is simple and straightforward. Fill out the form below, and our team will guide you through the next steps.</p>
-        <p><strong>Admission is open for all students from grades 1 to 10.</strong></p>
+        <p>We are excited to have you join us! The admission process at Swarup Academy is simple and straightforward. Fill out the application form, and our team will get back to you with further details.</p>
     </section>
     <footer>
-        <p>&copy; 2025 Swarup Academy. All rights reserved.</p>
+        <hr>
+        <p>Made with love by Swarup ❤️</p>
     </footer>
 </body>
 </html>
