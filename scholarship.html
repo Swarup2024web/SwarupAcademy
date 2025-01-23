@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swarup Academy - Scholarship</title>
     <style>
+        /* Same global styles as index.html */
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #fff;
-            color: #333;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
         header {
             background-color: #4285f4;
@@ -48,12 +49,27 @@
             color: #4285f4;
         }
         footer {
-            background-color: #f8f8f8;
+            background-color: #f1f1f1;
             padding: 20px 0;
             text-align: center;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
+            font-family: 'Arial', sans-serif;
+            color: #555;
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            position: relative;
+        }
+        footer p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            animation: textAnimation 5s infinite;
+        }
+        @keyframes textAnimation {
+            0% { color: #4285f4; }
+            25% { color: #db4437; }
+            50% { color: #f4b400; }
+            75% { color: #0f9d58; }
+            100% { color: #4285f4; }
         }
     </style>
 </head>
@@ -71,11 +87,16 @@
     </header>
     <section>
         <h2>Scholarship Opportunities</h2>
-        <p>We are proud to offer scholarships for deserving students. If you are passionate about learning but need financial assistance, apply for a scholarship today!</p>
-        <p>Scholarships are available based on academic performance, financial need, and personal circumstances.</p>
+        <p>At Swarup Academy, we offer scholarships to deserving students who demonstrate exceptional academic potential. Apply today and take the next step towards achieving your dreams!</p>
+        <ul>
+            <li>Merit-Based Scholarships</li>
+            <li>Financial Aid for Low-Income Families</li>
+            <li>Specialized Scholarships for Various Fields of Study</li>
+        </ul>
     </section>
     <footer>
-        <p>&copy; 2025 Swarup Academy. All rights reserved.</p>
+        <hr>
+        <p>Made with love by Swarup ❤️</p>
     </footer>
 </body>
 </html>
