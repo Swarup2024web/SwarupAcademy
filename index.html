@@ -55,7 +55,6 @@
             font-family: 'Arial', sans-serif;
             color: #555;
             margin-top: 40px;
-            border-top: 1px solid #ddd;
             position: relative;
         }
         footer p {
@@ -71,6 +70,33 @@
             75% { color: #0f9d58; }
             100% { color: #4285f4; }
         }
+        .welcome-note {
+            font-size: 22px;
+            color: #0f9d58;
+        }
+        .subjects, .students-success, .testimonials {
+            margin-top: 30px;
+        }
+        .subjects ul, .students-success ul {
+            list-style-type: none;
+            padding: 0;
+            font-size: 18px;
+        }
+        .subjects li, .students-success li {
+            margin: 8px 0;
+        }
+        .testimonials blockquote {
+            font-style: italic;
+            font-size: 18px;
+            color: #db4437;
+            margin-top: 20px;
+        }
+        .testimonials cite {
+            display: block;
+            margin-top: 10px;
+            color: #4285f4;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -85,12 +111,51 @@
             </ul>
         </nav>
     </header>
+
     <section>
-        <h2>Welcome to Swarup Academy</h2>
-        <p>Providing quality education with a focus on student development and academic growth. Join us and start your learning journey today!</p>
+        <h2>Welcome to Swarup Academy! 🎓</h2>
+        <p class="welcome-note">Here, we nurture young minds to build their future with knowledge and skills. Join us in this incredible journey of learning!</p>
+
+        <div class="subjects">
+            <h3>Subjects I Teach:</h3>
+            <ul>
+                <li>Mathematics</li>
+                <li>Bengali</li>
+                <li>English</li>
+                <li>Sanskrit</li>
+                <li>History</li>
+                <li>Geography</li>
+                <li>Physical Science</li>
+                <li>Life Science</li>
+            </ul>
+        </div>
+
+        <div class="students-success">
+            <h3>Students Success List:</h3>
+            <ul>
+                <li>Aditya Pramanik (1st, Class 7): 92%</li>
+                <li>Sujan Pramanik (2nd, Class 8): 80%</li>
+                <li>Sristi Chakraborty (3rd, Class 8): 75%</li>
+                <li>Piyali Roy (2nd, Class 9): 88%</li>
+                <li>Sampa Tanti (3rd, Class 9): 82%</li>
+                <li>And many more to go...</li>
+            </ul>
+        </div>
+
+        <div class="testimonials">
+            <h3>What Our Students Say:</h3>
+            <blockquote>
+                "Swarup Sir's teaching methods are the best! I learned so much and always look forward to his classes!" 
+                <cite>Aditya Pramanik, Class 7</cite>
+            </blockquote>
+            <blockquote>
+                "The lessons are very clear and easy to understand. I feel more confident in my studies thanks to Swarup Sir."
+                <cite>Sujan Pramanik, Class 8</cite>
+            </blockquote>
+        </div>
     </section>
+
     <footer>
-        <hr>
         <p>Made with love by Swarup ❤️</p>
     </footer>
 </body>
