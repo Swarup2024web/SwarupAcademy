@@ -1,289 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Swarup Academy</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* General Setup */
-        body {
-            font-family: 'Poppins', sans-serif;
+        /* Reset styles */
+        * {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #6e7bff, #3498db);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+            box-sizing: border-box;
         }
 
+        /* Body Styles */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Header */
         header {
             background-color: #2c3e50;
-            text-align: center;
-            padding: 30px 0;
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin: 0;
-            letter-spacing: 2px;
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin-top: 10px;
-            font-weight: 400;
-        }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            background-color: #2980b9;
-            padding: 15px 0;
-        }
-
-        nav a {
             color: white;
-            font-size: 18px;
-            text-decoration: none;
-            padding: 10px 20px;
-            transition: background-color 0.3s ease;
-            text-transform: uppercase;
-        }
-
-        nav a:hover {
-            background-color: #1abc9c;
-            border-radius: 5px;
-        }
-
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            padding: 20px;
             text-align: center;
-            padding: 30px;
-            background: #ecf0f1;
         }
 
-        .subjects,
-        .students-success,
-        .testimonials {
-            background-color: #ffffff;
-            border-radius: 10px;
-            margin-top: 20px;
-            padding: 30px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            width: 80%;
+        header h1 {
+            font-size: 36px;
         }
 
-        .subjects h3,
-        .students-success h3,
-        .testimonials h3 {
-            font-size: 1.8rem;
-            color: #2980b9;
+        /* Navigation */
+        nav {
+            background-color: #34495e;
+            padding: 10px;
+        }
+
+        nav ul {
+            list-style: none;
+            text-align: center;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Section */
+        .main {
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .main h2 {
+            font-size: 28px;
             margin-bottom: 20px;
         }
 
-        .subjects ul,
-        .students-success table,
-        .testimonials blockquote {
-            list-style: none;
-            padding: 0;
-        }
-
-        .subjects ul li {
-            font-size: 1.2rem;
-            margin: 10px 0;
-            padding-left: 30px;
-            position: relative;
-        }
-
-        .subjects ul li i {
-            position: absolute;
-            left: 10px;
-            top: 0;
-            color: #2980b9;
-        }
-
-        .students-success table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .students-success table th,
-        .students-success table td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .students-success table th {
-            background-color: #2980b9;
-            color: white;
-        }
-
-        .testimonials blockquote {
-            background-color: #f7f7f7;
-            font-style: italic;
-            padding: 20px;
-            margin: 10px 0;
-            border-left: 5px solid #2980b9;
-        }
-
-        .testimonials cite {
-            color: #7f8c8d;
-            font-size: 1rem;
-        }
-
-        footer {
-            background-color: #2c3e50;
-            text-align: center;
-            padding: 20px 0;
-            font-size: 1.2rem;
-            color: white;
-        }
-
-        .footer-text {
-            font-weight: 400;
-            color: #ecf0f1;
-        }
-
-        .footer-text span {
-            color: #3498db;
-            font-weight: 600;
+        .main p {
+            font-size: 18px;
+            margin-bottom: 30px;
         }
 
         .btn {
-            background-color: #3498db;
-            padding: 15px 30px;
+            background-color: #27ae60;
             color: white;
-            font-size: 1.2rem;
-            border-radius: 5px;
+            padding: 10px 20px;
             text-decoration: none;
-            text-transform: uppercase;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            font-size: 18px;
         }
 
         .btn:hover {
-            background-color: #2980b9;
+            background-color: #2ecc71;
         }
 
-        .content h3 {
-            color: #2c3e50;
+        /* Footer */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
         }
 
+        footer p {
+            font-size: 14px;
+        }
     </style>
 </head>
-
 <body>
-
+    <!-- Header -->
     <header>
         <h1>Swarup Academy</h1>
-        <h2>Education with Excellence</h2>
     </header>
 
+    <!-- Navigation -->
     <nav>
-        <a href="index.html">Home</a>
-        <a href="admission.html">Admission</a>
-        <a href="scholarship.html">Scholarship</a>
-        <a href="resources.html">Resources</a>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Courses</a></li>
+            <li><a href="#">Admissions</a></li>
+            <li><a href="#">Contact Us</a></li>
+        </ul>
     </nav>
 
-    <div class="content">
-        <!-- Welcome Section -->
-        <section>
-            <h3>Welcome to Swarup Academy!</h3>
-            <p>Where your learning journey begins with personalized guidance and high-quality education.</p>
-        </section>
-
-        <!-- Subjects I Teach -->
-        <section class="subjects">
-            <h3>Subjects I Teach</h3>
-            <ul>
-                <li><i class="fas fa-square-root-alt"></i> Mathematics</li>
-                <li><i class="fas fa-book"></i> Bengali</li>
-                <li><i class="fas fa-language"></i> English</li>
-                <li><i class="fas fa-font"></i> Sanskrit</li>
-                <li><i class="fas fa-history"></i> History</li>
-                <li><i class="fas fa-globe"></i> Geography</li>
-                <li><i class="fas fa-flask"></i> Physical Science</li>
-                <li><i class="fas fa-leaf"></i> Life Science</li>
-            </ul>
-        </section>
-
-        <!-- Students Success List -->
-        <section class="students-success">
-            <h3>Students Success List</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Rank</th>
-                        <th>Class</th>
-                        <th>Percentage</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Aditya Pramanik</td>
-                        <td>1st</td>
-                        <td>Class 7</td>
-                        <td>92%</td>
-                    </tr>
-                    <tr>
-                        <td>Sujan Pramanik</td>
-                        <td>2nd</td>
-                        <td>Class 8</td>
-                        <td>80%</td>
-                    </tr>
-                    <tr>
-                        <td>Sristi Chakraborty</td>
-                        <td>3rd</td>
-                        <td>Class 8</td>
-                        <td>75%</td>
-                    </tr>
-                    <tr>
-                        <td>Piyali Roy</td>
-                        <td>2nd</td>
-                        <td>Class 9</td>
-                        <td>88%</td>
-                    </tr>
-                    <tr>
-                        <td>Sampa Tanti</td>
-                        <td>3rd</td>
-                        <td>Class 9</td>
-                        <td>82%</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Testimonials -->
-        <section class="testimonials">
-            <h3>What My Students Say</h3>
-            <blockquote>
-                "Swarup Sir is an excellent teacher who makes even the most difficult subjects interesting and easy to understand."
-                <cite>Aditya Pramanik, Class 7</cite>
-            </blockquote>
-            <blockquote>
-                "Thanks to Sir's guidance, I have become more confident in my studies. The classes are always engaging!"
-                <cite>Sujan Pramanik, Class 8</cite>
-            </blockquote>
-            <a href="admission.html" class="btn">Join Swarup Academy</a>
-        </section>
+    <!-- Main Section -->
+    <div class="main">
+        <h2>Welcome to Swarup Academy</h2>
+        <p>Your path to quality education starts here. Join us to achieve academic excellence and success.</p>
+        <a href="#" class="btn">Learn More</a>
     </div>
 
+    <!-- Footer -->
     <footer>
-        <p class="footer-text">Made with love by <span>Swarup ❤️</span></p>
+        <p>&copy; 2025 Swarup Academy. All rights reserved.</p>
     </footer>
-
 </body>
-
 </html>
