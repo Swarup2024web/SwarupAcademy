@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swarup Academy - Contact</title>
     <style>
+        /* Same global styles as index.html */
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #fff;
-            color: #333;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
         header {
             background-color: #4285f4;
@@ -47,16 +48,54 @@
         section h2 {
             color: #4285f4;
         }
-        section p {
-            font-size: 18px;
-        }
         footer {
-            background-color: #f8f8f8;
+            background-color: #f1f1f1;
             padding: 20px 0;
             text-align: center;
-            position: fixed;
+            font-family: 'Arial', sans-serif;
+            color: #555;
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            position: relative;
+        }
+        footer p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            animation: textAnimation 5s infinite;
+        }
+        @keyframes textAnimation {
+            0% { color: #4285f4; }
+            25% { color: #db4437; }
+            50% { color: #f4b400; }
+            75% { color: #0f9d58; }
+            100% { color: #4285f4; }
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        form input, form textarea {
             width: 100%;
-            bottom: 0;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        form button {
+            background-color: #4285f4;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #357ae8;
         }
     </style>
 </head>
@@ -74,13 +113,23 @@
     </header>
     <section>
         <h2>Contact Us</h2>
-        <p>If you have any questions, feel free to reach out to us. Our team is always here to help you with any information regarding the academy, admissions, or other resources.</p>
-        <p><strong>Email:</strong> info@swarupacademy.com</p>
-        <p><strong>Phone:</strong> +91 123 456 7890</p>
-        <p><strong>Address:</strong> Swarup Academy, XYZ Road, City, State, 12345</p>
+        <p>If you have any questions or need further information, feel free to reach out to us. We'd love to hear from you!</p>
+        <form action="mailto:youremail@example.com" method="POST" enctype="multipart/form-data">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="email">Your Email</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="message">Your Message</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+            
+            <button type="submit">Send Message</button>
+        </form>
     </section>
     <footer>
-        <p>&copy; 2025 Swarup Academy. All rights reserved.</p>
+        <hr>
+        <p>Made with love by Swarup ❤️</p>
     </footer>
 </body>
 </html>
