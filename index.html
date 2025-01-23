@@ -18,6 +18,9 @@
             line-height: 1.6;
             background-color: #f4f4f4;
             color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         /* Header */
@@ -64,14 +67,37 @@
             text-align: center;
         }
 
-        .main h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
+        .banner {
+            background-color: #27ae60;
+            color: white;
+            padding: 20px;
+            font-size: 24px;
+            margin-bottom: 40px;
         }
 
-        .main p {
-            font-size: 18px;
-            margin-bottom: 30px;
+        .banner a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .welcome-note, .about, .students, .subjects, .testimonials {
+            margin-bottom: 40px;
+        }
+
+        .about, .students, .subjects {
+            text-align: left;
+            margin-left: 20px;
+        }
+
+        .students table, .testimonials blockquote {
+            width: 100%;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .students table th, .students table td, .testimonials blockquote {
+            padding: 10px;
         }
 
         .btn {
@@ -93,6 +119,7 @@
             color: white;
             padding: 20px;
             text-align: center;
+            margin-top: auto;
         }
 
         footer p {
@@ -117,11 +144,76 @@
         </ul>
     </nav>
 
-    <!-- Main Section -->
-    <div class="main">
+    <!-- Banner -->
+    <div class="banner">
+        <span>Admission going on! <a href="admission.html">Click here to apply</a></span>
+    </div>
+
+    <!-- Welcome Note -->
+    <div class="welcome-note">
         <h2>Welcome to Swarup Academy</h2>
         <p>Your path to quality education starts here. Join us to achieve academic excellence and success.</p>
-        <a href="admission.html" class="btn">Learn More</a>
+    </div>
+
+    <!-- About Me Section -->
+    <div class="about">
+        <h2>About Me</h2>
+        <p><strong>Educational Qualifications:</strong> M.Sc. in Physics, B.Ed.</p>
+        <p><strong>Experience:</strong> 5+ years of teaching experience in Physics and Mathematics for high school students.</p>
+    </div>
+
+    <!-- Students Success List -->
+    <div class="students">
+        <h2>Students Success List</h2>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Rank</th>
+                <th>Class</th>
+                <th>Percentage</th>
+            </tr>
+            <tr>
+                <td>John Doe</td>
+                <td>1</td>
+                <td>10th</td>
+                <td>95%</td>
+            </tr>
+            <tr>
+                <td>Jane Smith</td>
+                <td>2</td>
+                <td>12th</td>
+                <td>92%</td>
+            </tr>
+            <tr>
+                <td>Samuel Lee</td>
+                <td>3</td>
+                <td>10th</td>
+                <td>90%</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Subjects I Teach -->
+    <div class="subjects">
+        <h2>Subjects I Teach</h2>
+        <ul>
+            <li>Physics (Class 9-12)</li>
+            <li>Mathematics (Class 9-10)</li>
+            <li>Science (Class 6-8)</li>
+        </ul>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="testimonials">
+        <h2>What Our Students Say</h2>
+        <blockquote>
+            "Swarup Sir's teaching method is amazing! I scored 95% in my board exams thanks to his guidance."
+            <footer>- John Doe</footer>
+        </blockquote>
+        <blockquote>
+            "Best tutor ever! He makes complex topics easy to understand."
+            <footer>- Jane Smith</footer>
+        </blockquote>
     </div>
 
     <!-- Footer -->
