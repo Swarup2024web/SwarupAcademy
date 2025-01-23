@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swarup Academy - Home</title>
     <style>
+        /* Global styles */
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #fff;
-            color: #333;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
         header {
             background-color: #4285f4;
@@ -47,19 +48,28 @@
         section h2 {
             color: #4285f4;
         }
-        .footer-box {
-            background-color: #f8f8f8;
-            padding: 15px;
+        footer {
+            background-color: #f1f1f1;
+            padding: 20px 0;
             text-align: center;
+            font-family: 'Arial', sans-serif;
+            color: #555;
             margin-top: 40px;
-            border: 2px solid #ddd;
-            width: 100%;
+            border-top: 1px solid #ddd;
             position: relative;
         }
-        .footer-box p {
+        footer p {
             margin: 0;
             font-size: 16px;
-            color: #555;
+            font-weight: bold;
+            animation: textAnimation 5s infinite;
+        }
+        @keyframes textAnimation {
+            0% { color: #4285f4; }
+            25% { color: #db4437; }
+            50% { color: #f4b400; }
+            75% { color: #0f9d58; }
+            100% { color: #4285f4; }
         }
     </style>
 </head>
@@ -79,8 +89,9 @@
         <h2>Welcome to Swarup Academy</h2>
         <p>Providing quality education with a focus on student development and academic growth. Join us and start your learning journey today!</p>
     </section>
-    <div class="footer-box">
+    <footer>
+        <hr>
         <p>Made with love by Swarup ❤️</p>
-    </div>
+    </footer>
 </body>
 </html>
