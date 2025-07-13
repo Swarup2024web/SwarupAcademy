@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #fef2f7;
+      background: #fff0f5;
       padding: 20px;
       color: #333;
     }
@@ -16,7 +16,7 @@
       color: #d81b60;
     }
     section {
-      background: #fff0f5;
+      background: #ffe6f0;
       padding: 20px;
       margin: 20px auto;
       max-width: 900px;
@@ -30,14 +30,15 @@
     }
     th, td {
       padding: 10px;
-      border-bottom: 1px solid #ffd6e6;
+      border-bottom: 1px solid #ffccde;
       text-align: left;
     }
     input[type="text"], input[type="number"] {
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      width: 90%;
+      width: 100%;
+      box-sizing: border-box;
     }
     button {
       padding: 8px 16px;
@@ -52,160 +53,176 @@
     }
     .form-grid {
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
+      gap: 10px;
       margin-top: 10px;
     }
     .form-grid input {
       flex: 1;
     }
+    .form-grid button {
+      flex: 0 0 auto;
+    }
+    @media(max-width: 600px) {
+      .form-grid {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <h1>Admin Panel</h1>
+<h1>Admin Panel</h1>
 
-  <!-- 🔁 Bulk Update Points -->
-  <section>
-    <h2>Bulk Add Points</h2>
-    <input type="number" id="bulkPoints" placeholder="Points to add to selected" />
-    <button onclick="bulkUpdate()">Update Points</button>
+<!-- 🔵 Add Student -->
+<section>
+  <h2>Add Student</h2>
+  <div class="form-grid">
+    <input type="text" id="studentName" placeholder="Student name" />
+    <input type="text" id="studentImage" placeholder="Image file (e.g., sampa.png)" />
+    <button onclick="addStudent()">Add Student</button>
+  </div>
+</section>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Select</th>
-          <th>Name</th>
-          <th>Total Points</th>
-        </tr>
-      </thead>
-      <tbody id="studentTableBody"></tbody>
-    </table>
-  </section>
+<!-- 🟣 Bulk Add Points -->
+<section>
+  <h2>Bulk Add Points</h2>
+  <div class="form-grid">
+    <input type="number" id="bulkPoints" placeholder="Points to add" />
+    <button onclick="bulkUpdate()">Update Selected</button>
+  </div>
 
-  <!-- ✅ Add Task -->
-  <section>
-    <h2>Add Task</h2>
-    <div class="form-grid">
-      <input type="text" id="taskName" placeholder="Task name" />
-      <input type="number" id="taskPoints" placeholder="Points" />
-      <input type="text" id="taskImage" placeholder="Image (e.g., reading.png)" />
-      <button onclick="addTask()">Add Task</button>
-    </div>
-  </section>
+  <table>
+    <thead>
+      <tr>
+        <th>Select</th>
+        <th>Name</th>
+        <th>Total Points</th>
+      </tr>
+    </thead>
+    <tbody id="studentTableBody"></tbody>
+  </table>
+</section>
 
-  <!-- 🎁 Add Gift -->
-  <section>
-    <h2>Add Gift</h2>
-    <div class="form-grid">
-      <input type="text" id="giftName" placeholder="Gift name" />
-      <input type="number" id="giftCost" placeholder="Cost" />
-      <input type="text" id="giftImage" placeholder="Image (e.g., pen.png)" />
-      <button onclick="addGift()">Add Gift</button>
-    </div>
-  </section>
+<!-- 🟠 Add Task -->
+<section>
+  <h2>Add Task</h2>
+  <div class="form-grid">
+    <input type="text" id="taskName" placeholder="Task name" />
+    <input type="number" id="taskPoints" placeholder="Points" />
+    <input type="text" id="taskImage" placeholder="Image file (e.g., read.png)" />
+    <button onclick="addTask()">Add Task</button>
+  </div>
+</section>
 
-  <!-- Firebase Script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getFirestore, collection, getDocs, doc, updateDoc, addDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { firebaseConfig } from "./firebaseConfig.js";
+<!-- 🟡 Add Gift -->
+<section>
+  <h2>Add Gift</h2>
+  <div class="form-grid">
+    <input type="text" id="giftName" placeholder="Gift name" />
+    <input type="number" id="giftCost" placeholder="Cost" />
+    <input type="text" id="giftImage" placeholder="Image file (e.g., pen.png)" />
+    <button onclick="addGift()">Add Gift</button>
+  </div>
+</section>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+<!-- 🔗 Firebase Script -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs, doc, updateDoc, addDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { firebaseConfig } from "./firebaseConfig.js";
 
-    let students = [];
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    async function loadStudents() {
-      const snapshot = await getDocs(collection(db, "students"));
-      students = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
+  let students = [];
 
-      const tbody = document.getElementById("studentTableBody");
-      tbody.innerHTML = "";
+  async function loadStudents() {
+    const snap = await getDocs(collection(db, "students"));
+    students = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      students.forEach(student => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><input type="checkbox" class="studentCheckbox" data-id="${student.id}" /></td>
-          <td>${student.name}</td>
-          <td>${student.totalPoints}</td>
-        `;
-        tbody.appendChild(tr);
+    const tbody = document.getElementById("studentTableBody");
+    tbody.innerHTML = "";
+    students.forEach(s => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><input type="checkbox" class="select" data-id="${s.id}"></td>
+        <td>${s.name}</td>
+        <td>${s.totalPoints}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  window.bulkUpdate = async function () {
+    const points = parseInt(document.getElementById("bulkPoints").value);
+    if (isNaN(points)) return alert("Enter valid points!");
+
+    const boxes = document.querySelectorAll(".select:checked");
+    if (!boxes.length) return alert("Select at least one student!");
+
+    for (const box of boxes) {
+      const id = box.dataset.id;
+      const student = students.find(s => s.id === id);
+      if (!student) continue;
+      await updateDoc(doc(db, "students", id), {
+        totalPoints: student.totalPoints + points
       });
     }
 
-    async function bulkUpdate() {
-      const points = parseInt(document.getElementById("bulkPoints").value);
-      if (isNaN(points)) return alert("Please enter a valid number of points.");
-
-      const checkboxes = document.querySelectorAll(".studentCheckbox:checked");
-
-      if (checkboxes.length === 0) {
-        alert("Please select at least one student.");
-        return;
-      }
-
-      for (const checkbox of checkboxes) {
-        const id = checkbox.dataset.id;
-        const student = students.find(s => s.id === id);
-        const newTotal = student.totalPoints + points;
-
-        await updateDoc(doc(db, "students", id), {
-          totalPoints: newTotal
-        });
-      }
-
-      alert("✅ Points updated for selected students.");
-      document.getElementById("bulkPoints").value = "";
-      loadStudents();
-    }
-
-    async function addTask() {
-      const name = document.getElementById("taskName").value.trim();
-      const points = parseInt(document.getElementById("taskPoints").value);
-      const image = document.getElementById("taskImage").value.trim();
-
-      if (!name || isNaN(points) || !image) {
-        alert("Fill all task fields.");
-        return;
-      }
-
-      await addDoc(collection(db, "tasks"), {
-        name, points, image
-      });
-
-      alert("✅ Task added!");
-      document.getElementById("taskName").value = "";
-      document.getElementById("taskPoints").value = "";
-      document.getElementById("taskImage").value = "";
-    }
-
-    async function addGift() {
-      const name = document.getElementById("giftName").value.trim();
-      const cost = parseInt(document.getElementById("giftCost").value);
-      const image = document.getElementById("giftImage").value.trim();
-
-      if (!name || isNaN(cost) || !image) {
-        alert("Fill all gift fields.");
-        return;
-      }
-
-      await addDoc(collection(db, "gifts"), {
-        name, cost, image
-      });
-
-      alert("🎁 Gift added!");
-      document.getElementById("giftName").value = "";
-      document.getElementById("giftCost").value = "";
-      document.getElementById("giftImage").value = "";
-    }
-
+    alert("✅ Points updated!");
+    document.getElementById("bulkPoints").value = "";
     loadStudents();
-  </script>
+  };
+
+  window.addStudent = async function () {
+    const name = document.getElementById("studentName").value.trim();
+    const image = document.getElementById("studentImage").value.trim();
+    if (!name || !image) return alert("Fill all student fields");
+
+    await addDoc(collection(db, "students"), {
+      name,
+      image,
+      totalPoints: 0,
+      pointsSpent: 0
+    });
+
+    alert("🧑 Student added!");
+    document.getElementById("studentName").value = "";
+    document.getElementById("studentImage").value = "";
+    loadStudents();
+  };
+
+  window.addTask = async function () {
+    const name = document.getElementById("taskName").value.trim();
+    const points = parseInt(document.getElementById("taskPoints").value);
+    const image = document.getElementById("taskImage").value.trim();
+    if (!name || isNaN(points) || !image) return alert("Fill all task fields");
+
+    await addDoc(collection(db, "tasks"), { name, points, image });
+    alert("✅ Task added!");
+    document.getElementById("taskName").value = "";
+    document.getElementById("taskPoints").value = "";
+    document.getElementById("taskImage").value = "";
+  };
+
+  window.addGift = async function () {
+    const name = document.getElementById("giftName").value.trim();
+    const cost = parseInt(document.getElementById("giftCost").value);
+    const image = document.getElementById("giftImage").value.trim();
+    if (!name || isNaN(cost) || !image) return alert("Fill all gift fields");
+
+    await addDoc(collection(db, "gifts"), { name, cost, image });
+    alert("🎁 Gift added!");
+    document.getElementById("giftName").value = "";
+    document.getElementById("giftCost").value = "";
+    document.getElementById("giftImage").value = "";
+  };
+
+  loadStudents();
+</script>
+
 </body>
 </html>
