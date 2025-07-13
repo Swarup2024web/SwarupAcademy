@@ -1,4 +1,4 @@
-/* === GLOBAL PAGE === */
+/* === GLOBAL PAGE STYLING === */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -42,7 +42,7 @@ body {
   background: #ffffff;
 }
 
-/* Points & Level */
+/* Points & Level Display */
 .level-box {
   font-size: 16px;
   font-weight: bold;
@@ -209,6 +209,7 @@ img.avatar {
   color: #333;
   font-weight: bold;
 }
+
 /* === RESPONSIVENESS === */
 @media (max-width: 768px) {
   .header input {
@@ -293,4 +294,4 @@ img.avatar {
   h2 {
     font-size: 20px;
   }
-  }
+    }
