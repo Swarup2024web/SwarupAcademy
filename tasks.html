@@ -33,7 +33,7 @@
   <!-- 📋 Task List -->
   <div class="container">
     <h2 class="page-title">Assigned Tasks</h2>
-    <div id="tasksList"></div>
+    <div id="tasksList" class="task-grid"></div>
   </div>
 
   <!-- 🔌 Firebase & Logic -->
@@ -104,18 +104,18 @@
         const task = docSnap.data();
         const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${task.image}`;
 
-        const div = document.createElement("div");
-        div.className = "task-card";
-        div.innerHTML = `
+        const card = document.createElement("div");
+        card.className = "task-card";
+        card.innerHTML = `
           <div class="task-img">
             <img src="${imageUrl}" alt="${task.name}" />
           </div>
           <div class="task-info">
             <h3>${task.name}</h3>
-            <div class="task-points">${task.points} pts</div>
+            <div class="task-points rainbow">${task.points} pts</div>
           </div>
         `;
-        tasksList.appendChild(div);
+        tasksList.appendChild(card);
       });
     }
 
