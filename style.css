@@ -1,4 +1,4 @@
-/* Reset & Basics */
+/* Reset & Base Styles */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
@@ -25,9 +25,11 @@ body {
   border-radius: 20px;
   background-color: #fff;
   color: #333;
+  width: 80%;
+  max-width: 300px;
 }
 
-/* Points + Level */
+/* Points + Level Display */
 .status {
   text-align: center;
   font-size: 16px;
@@ -36,7 +38,7 @@ body {
   color: #ad1457;
 }
 
-/* Navigation Row */
+/* Navigation Icons */
 .nav {
   display: flex;
   justify-content: center;
@@ -58,7 +60,7 @@ body {
   transform: scale(1.2);
 }
 
-/* Page Container */
+/* Container */
 .container {
   max-width: 900px;
   margin: 20px auto;
@@ -72,7 +74,7 @@ body {
   margin-bottom: 20px;
 }
 
-/* Table Styling (Leaderboard) */
+/* Leaderboard Table */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -104,63 +106,88 @@ tr:hover {
   border: 2px solid #f48fb1;
 }
 
-/* Card Layout (Tasks & Gifts) */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
-}
-
-.card {
+/* Task & Gift Card (Two Column Flex Layout) */
+.task-card {
+  display: flex;
   background-color: #fff;
   border: 2px solid #f8bbd0;
   border-radius: 16px;
-  padding: 15px;
-  text-align: center;
-  box-shadow: 2px 2px 10px rgba(255, 105, 180, 0.2);
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(255, 105, 180, 0.1);
+  overflow: hidden;
   transition: transform 0.2s ease;
 }
 
-.card:hover {
-  transform: translateY(-5px);
+.task-card:hover {
+  transform: scale(1.01);
 }
 
-.card img {
+/* Image Column */
+.task-img {
+  flex: 1;
+  min-width: 120px;
+  max-width: 150px;
+  overflow: hidden;
+}
+
+.task-img img {
   width: 100%;
-  height: 150px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 10px;
+  border-radius: 0 16px 16px 0;
 }
 
-.card h3 {
+/* Info Column */
+.task-info {
+  flex: 2;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.task-info h3 {
+  margin: 0 0 10px;
   font-size: 18px;
-  color: #ad1457;
-  margin: 5px 0;
+  color: #880e4f;
 }
 
-.card p {
-  font-size: 15px;
-  color: #555;
-  margin-bottom: 10px;
+/* Animated Points Bubble */
+.task-points {
+  background: #f06292;
+  color: white;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 10px rgba(240, 98, 146, 0.4);
 }
 
-.card button {
-  padding: 8px 16px;
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Redeem Button */
+.task-info button {
+  margin-top: 10px;
   background-color: #f06292;
   color: white;
-  border: none;
-  border-radius: 20px;
+  padding: 6px 14px;
   font-size: 14px;
+  border: none;
+  border-radius: 30px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: 0.3s;
 }
 
-.card button:hover {
+.task-info button:hover {
   background-color: #d81b60;
 }
 
-/* Mobile Friendly */
+/* Mobile Responsive */
 @media (max-width: 600px) {
   .nav {
     gap: 20px;
@@ -172,8 +199,12 @@ tr:hover {
     height: 30px;
   }
 
-  .card img {
-    height: 120px;
+  .task-card {
+    flex-direction: column;
+  }
+
+  .task-img img {
+    border-radius: 16px 16px 0 0;
   }
 
   .login select {
@@ -185,7 +216,7 @@ tr:hover {
     font-size: 14px;
   }
 
-  .card button {
+  .task-info button {
     font-size: 13px;
     padding: 6px 12px;
   }
