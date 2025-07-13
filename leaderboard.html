@@ -2,51 +2,119 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Leaderboard</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ffb6c1;
+    }
+    @media (max-width: 600px) {
+      .avatar {
+        width: 30px;
+        height: 30px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- 🌸 HEADER -->
+  <!-- 🔼 HEADER WITH 3 ROWS -->
   <div class="header">
-    <!-- Row 1: Name input for login -->
-    <div class="header-row">
-      <input type="text" id="nameInput" placeholder="Enter your name and press Enter" onkeydown="handleKey(event)">
+    <!-- Row 1: Dropdown for student login -->
+    <div class="login">
+      <select id="studentSelect">
+        <option value="">👤 Select Student</option>
+      </select>
     </div>
 
     <!-- Row 2: Points & Level -->
-    <div class="level-box" id="userStats">Not logged in</div>
+    <div class="status" id="studentStatus">
+      Select a student to view points and level.
+    </div>
 
     <!-- Row 3: Navigation Tabs -->
-    <div class="nav-tabs">
+    <div class="nav">
       <a href="leaderboard.html" title="Leaderboard">🏆</a>
       <a href="tasks.html" title="Tasks">📋</a>
       <a href="gifts.html" title="Gifts">🎁</a>
     </div>
   </div>
 
-  <!-- 🏆 LEADERBOARD LIST -->
-  <div class="leaderboard" id="leaderboardContainer">
-    Loading leaderboard...
+  <!-- 🏆 Leaderboard Table -->
+  <div class="container">
+    <h2 style="text-align:center; margin-bottom: 10px; color:#c2185b;">Top Students</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Total Points</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboardBody"></tbody>
+    </table>
   </div>
 
-  <!-- Firebase + Script -->
+  <!-- 🔌 Firebase & Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, collection, getDocs
+      getFirestore, collection, getDocs, doc, getDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const imageBase = "https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/";
 
-    let students = [];
-    let currentUser = null;
+    const studentSelect = document.getElementById("studentSelect");
+    const studentStatus = document.getElementById("studentStatus");
+    const leaderboardBody = document.getElementById("leaderboardBody");
 
-    // Calculate level from total points
+    // 🟢 Load all students into dropdown and table
+    async function loadStudents() {
+      const snap = await getDocs(collection(db, "students"));
+      const students = [];
+
+      snap.forEach(doc => {
+        const data = doc.data();
+        students.push({ id: doc.id, ...data });
+
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.textContent = data.name;
+        studentSelect.appendChild(option);
+      });
+
+      // Preselect if saved in storage
+      const savedID = localStorage.getItem("studentID");
+      if (savedID) {
+        studentSelect.value = savedID;
+        loadStudentInfo(savedID);
+      }
+
+      // Sort and show leaderboard
+      students.sort((a, b) => b.totalPoints - a.totalPoints);
+      leaderboardBody.innerHTML = "";
+      students.forEach((s, index) => {
+        const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${s.image}`;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td><img src="${imageUrl}" alt="${s.name}" class="avatar" /></td>
+          <td>${s.name}</td>
+          <td>${s.totalPoints}</td>
+        `;
+        leaderboardBody.appendChild(tr);
+      });
+    }
+
+    // 🧠 Calculate Level by totalPoints
     function calculateLevel(points) {
       if (points >= 800) return 3;
       if (points >= 500) return 2;
@@ -54,61 +122,27 @@
       return 0;
     }
 
-    function handleKey(e) {
-      if (e.key === "Enter") login();
+    // 🔁 Update student header info
+    async function loadStudentInfo(id) {
+      const ref = doc(db, "students", id);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return;
+
+      const student = snap.data();
+      const level = calculateLevel(student.totalPoints);
+      studentStatus.innerHTML = `🎓 <strong>${student.name}</strong><br>Points: <strong>${student.totalPoints}</strong> | Level: <strong>${level}</strong>`;
     }
 
-    function login() {
-      const inputName = document.getElementById("nameInput").value.trim().toLowerCase();
-      if (!inputName) return;
+    // 📥 On student dropdown change
+    studentSelect.addEventListener("change", () => {
+      const id = studentSelect.value;
+      if (!id) return;
+      localStorage.setItem("studentID", id);
+      loadStudentInfo(id);
+    });
 
-      const found = students.find(s => s.name.toLowerCase() === inputName);
-      if (!found) {
-        alert("Student not found!");
-        return;
-      }
-
-      currentUser = found;
-      document.getElementById("nameInput").value = "";
-      document.getElementById("nameInput").placeholder = found.name;
-
-      const availablePoints = found.totalPoints - found.pointsSpent;
-      const level = calculateLevel(found.totalPoints);
-
-      document.getElementById("userStats").innerText = `${availablePoints} pts | Level ${level}`;
-    }
-
-    async function loadLeaderboard() {
-      const snapshot = await getDocs(collection(db, "students"));
-      students = [];
-
-      snapshot.forEach(doc => {
-        students.push({ id: doc.id, ...doc.data() });
-      });
-
-      students.sort((a, b) => b.totalPoints - a.totalPoints);
-
-      const container = document.getElementById("leaderboardContainer");
-      container.innerHTML = "";
-
-      students.forEach((s, index) => {
-        const level = calculateLevel(s.totalPoints);
-        const row = document.createElement("div");
-        row.className = "leaderboard-entry";
-        row.innerHTML = `
-          <div class="rank">#${index + 1}</div>
-          <img src="${imageBase + s.image}" alt="${s.name}" />
-          <div class="info">
-            <h4>${s.name}</h4>
-            <p>Points: ${s.totalPoints}</p>
-            <p>Level: ${level}</p>
-          </div>
-        `;
-        container.appendChild(row);
-      });
-    }
-
-    loadLeaderboard();
+    loadStudents();
   </script>
+
 </body>
 </html>
