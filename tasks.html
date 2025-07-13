@@ -2,48 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tasks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- 🌸 HEADER -->
+  <!-- 🔼 HEADER -->
   <div class="header">
-    <!-- Row 1: Login -->
-    <div class="header-row">
-      <input type="text" id="nameInput" placeholder="Enter your name and press Enter" onkeydown="handleKey(event)">
+    <!-- Row 1: Dropdown for student login -->
+    <div class="login">
+      <select id="studentSelect">
+        <option value="">👤 Select Student</option>
+      </select>
     </div>
 
     <!-- Row 2: Points & Level -->
-    <div class="level-box" id="userStats">Not logged in</div>
+    <div class="status" id="studentStatus">
+      Select a student to view points and level.
+    </div>
 
-    <!-- Row 3: Nav Tabs -->
-    <div class="nav-tabs">
+    <!-- Row 3: Navigation Tabs -->
+    <div class="nav">
       <a href="leaderboard.html" title="Leaderboard">🏆</a>
       <a href="tasks.html" title="Tasks">📋</a>
       <a href="gifts.html" title="Gifts">🎁</a>
     </div>
   </div>
 
-  <!-- 📋 Task Grid -->
-  <div class="gift-grid" id="taskContainer">Loading tasks...</div>
+  <!-- 📋 Task List -->
+  <div class="container">
+    <h2 class="page-title">Assigned Tasks</h2>
+    <div class="card-grid" id="tasksList"></div>
+  </div>
 
-  <!-- Firebase + Script -->
+  <!-- 🔌 Firebase & Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, collection, getDocs
+      getFirestore, collection, getDocs, doc, getDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const imageBase = "https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/";
 
-    let students = [];
-    let currentUser = null;
-    let tasks = [];
+    const studentSelect = document.getElementById("studentSelect");
+    const studentStatus = document.getElementById("studentStatus");
+    const tasksList = document.getElementById("tasksList");
+
+    let currentStudentId = null;
 
     function calculateLevel(points) {
       if (points >= 800) return 3;
@@ -52,69 +60,64 @@
       return 0;
     }
 
-    function handleKey(e) {
-      if (e.key === "Enter") login();
-    }
-
-    function login() {
-      const input = document.getElementById("nameInput").value.trim().toLowerCase();
-      if (!input) return;
-
-      const found = students.find(s => s.name.toLowerCase() === input);
-      if (!found) {
-        alert("Student not found.");
-        return;
-      }
-
-      currentUser = found;
-      document.getElementById("nameInput").value = "";
-      document.getElementById("nameInput").placeholder = found.name;
-
-      updateUserStats();
-    }
-
-    function updateUserStats() {
-      if (!currentUser) return;
-      const level = calculateLevel(currentUser.totalPoints);
-      const available = currentUser.totalPoints - currentUser.pointsSpent;
-      document.getElementById("userStats").innerText = `${available} pts | Level ${level}`;
-    }
-
     async function loadStudents() {
-      const snapshot = await getDocs(collection(db, "students"));
-      students = [];
-      snapshot.forEach(doc => {
-        students.push({ id: doc.id, ...doc.data() });
+      const snap = await getDocs(collection(db, "students"));
+      snap.forEach(docSnap => {
+        const data = docSnap.data();
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = data.name;
+        studentSelect.appendChild(option);
       });
+
+      const savedID = localStorage.getItem("studentID");
+      if (savedID) {
+        studentSelect.value = savedID;
+        await loadStudentInfo(savedID);
+      }
+    }
+
+    studentSelect.addEventListener("change", async () => {
+      const id = studentSelect.value;
+      if (!id) return;
+      localStorage.setItem("studentID", id);
+      await loadStudentInfo(id);
+    });
+
+    async function loadStudentInfo(id) {
+      const ref = doc(db, "students", id);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return;
+
+      const student = snap.data();
+      currentStudentId = id;
+
+      const level = calculateLevel(student.totalPoints);
+      studentStatus.innerHTML = `🎓 <strong>${student.name}</strong><br>Points: <strong>${student.totalPoints}</strong> | Level: <strong>${level}</strong>`;
     }
 
     async function loadTasks() {
-      const snapshot = await getDocs(collection(db, "tasks"));
-      tasks = [];
-      snapshot.forEach(doc => {
-        tasks.push({ id: doc.id, ...doc.data() });
-      });
-      renderTasks();
-    }
+      const snap = await getDocs(collection(db, "tasks"));
+      tasksList.innerHTML = "";
 
-    function renderTasks() {
-      const container = document.getElementById("taskContainer");
-      container.innerHTML = "";
+      snap.forEach(docSnap => {
+        const task = docSnap.data();
+        const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${task.image}`;
 
-      tasks.forEach(task => {
         const div = document.createElement("div");
-        div.className = "gift-card";
+        div.className = "card";
         div.innerHTML = `
-          <img src="${imageBase + task.image}" alt="${task.name}" />
-          <h4>${task.name}</h4>
+          <img src="${imageUrl}" alt="${task.name}" />
+          <h3>${task.name}</h3>
           <p>Points: ${task.points}</p>
         `;
-        container.appendChild(div);
+        tasksList.appendChild(div);
       });
     }
 
     await loadStudents();
     await loadTasks();
   </script>
+
 </body>
 </html>
