@@ -6,260 +6,171 @@
   <title>Admin Panel</title>
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: #fff6fb;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 20px;
+      background: #fdf6ff;
       color: #333;
     }
-
-    h2 {
+    h1, h2 {
       text-align: center;
-      color: #cc3377;
-      margin-bottom: 30px;
+      color: #c2185b;
     }
-
-    .section {
-      background: #ffeef5;
-      border: 2px solid #ffb3cc;
-      border-radius: 12px;
+    section {
+      background: #fff0f5;
       padding: 20px;
-      margin-bottom: 30px;
+      margin: 20px auto;
+      max-width: 900px;
+      border-radius: 12px;
       box-shadow: 0 4px 8px rgba(255, 182, 193, 0.3);
     }
-
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #cc0052;
-    }
-
-    input, select {
+    table {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 2px solid #ff99bb;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    button {
+      border-collapse: collapse;
       margin-top: 15px;
-      padding: 10px 20px;
-      background: #ff66a3;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
     }
-
-    button:hover {
-      background: #e60073;
-    }
-
-    .student-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #fff;
-      border: 1px solid #ffccdd;
-      border-radius: 8px;
+    th, td {
       padding: 10px;
-      margin-bottom: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ffd6e6;
     }
-
-    .student-item input[type="checkbox"] {
-      margin-right: 10px;
+    input[type="text"], input[type="number"] {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 90%;
     }
-
-    @media (max-width: 600px) {
-      input, button {
-        font-size: 15px;
-      }
+    button {
+      padding: 8px 14px;
+      background: #e91e63;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #c2185b;
+    }
+    .form-grid {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .form-grid input {
+      flex: 1;
     }
   </style>
 </head>
 <body>
 
-  <h2>🌸 Admin Panel</h2>
+  <h1>🌟 Admin Panel</h1>
 
-  <!-- Add Student -->
-  <div class="section">
-    <h3>👩‍🎓 Add Student</h3>
-    <label>Name</label>
-    <input type="text" id="studentName" placeholder="Enter name" />
+  <!-- STUDENT POINTS SECTION -->
+  <section>
+    <h2>Update Student Points</h2>
+    <table id="studentTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Points to Add</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
 
-    <label>Image Filename (e.g. dip.png)</label>
-    <input type="text" id="studentImage" placeholder="Only the filename" />
+  <!-- ADD TASK SECTION -->
+  <section>
+    <h2>Add Task</h2>
+    <div class="form-grid">
+      <input type="text" id="taskName" placeholder="Task name" />
+      <input type="number" id="taskPoints" placeholder="Points" />
+      <input type="text" id="taskImage" placeholder="Image (e.g., reading.png)" />
+      <button onclick="addTask()">Add Task</button>
+    </div>
+  </section>
 
-    <label>Total Points</label>
-    <input type="number" id="studentPoints" placeholder="Start points" />
+  <!-- ADD GIFT SECTION -->
+  <section>
+    <h2>Add Gift</h2>
+    <div class="form-grid">
+      <input type="text" id="giftName" placeholder="Gift name" />
+      <input type="number" id="giftCost" placeholder="Cost (points)" />
+      <input type="text" id="giftImage" placeholder="Image (e.g., pen.png)" />
+      <button onclick="addGift()">Add Gift</button>
+    </div>
+  </section>
 
-    <button onclick="addStudent()">Add Student</button>
-  </div>
-
-  <!-- Add Task -->
-  <div class="section">
-    <h3>📋 Add Task</h3>
-    <label>Task Name</label>
-    <input type="text" id="taskName" placeholder="Enter task" />
-
-    <label>Points</label>
-    <input type="number" id="taskPoints" placeholder="e.g. 100" />
-
-    <button onclick="addTask()">Add Task</button>
-  </div>
-
-  <!-- Add Gift -->
-  <div class="section">
-    <h3>🎁 Add Gift</h3>
-    <label>Gift Name</label>
-    <input type="text" id="giftName" placeholder="Enter gift name" />
-
-    <label>Cost (Points)</label>
-    <input type="number" id="giftCost" placeholder="e.g. 200" />
-
-    <label>Image Filename (e.g. pen.png)</label>
-    <input type="text" id="giftImage" placeholder="Only the filename" />
-
-    <button onclick="addGift()">Add Gift</button>
-  </div>
-
-  <!-- Update Points -->
-  <div class="section">
-    <h3>✨ Update Points</h3>
-    <div id="studentsList">Loading students...</div>
-
-    <label>Points to Add/Subtract</label>
-    <input type="number" id="pointsToAdd" placeholder="e.g. 100 or -50" />
-
-    <button onclick="updatePoints()">Save Points</button>
-  </div>
-
-  <!-- Firebase + Script -->
+  <!-- FIREBASE & SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, collection, addDoc, getDocs, updateDoc, doc
+      getFirestore, collection, getDocs, doc, updateDoc, addDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function addStudent() {
-      const name = document.getElementById("studentName").value.trim();
-      const image = document.getElementById("studentImage").value.trim();
-      const totalPoints = parseInt(document.getElementById("studentPoints").value);
+    const studentsRef = collection(db, "students");
+    const tasksRef = collection(db, "tasks");
+    const giftsRef = collection(db, "gifts");
 
-      if (!name || !image || isNaN(totalPoints)) {
-        alert("Please fill all student fields.");
-        return;
-      }
+    async function loadStudents() {
+      const snapshot = await getDocs(studentsRef);
+      const table = document.querySelector("#studentTable tbody");
+      table.innerHTML = "";
 
-      await addDoc(collection(db, "students"), {
-        name: name,
-        image: image,
-        totalPoints: totalPoints,
-        pointsSpent: 0
+      snapshot.forEach(docSnap => {
+        const student = { id: docSnap.id, ...docSnap.data() };
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${student.name}</td>
+          <td><input type="number" id="pts-${student.id}" placeholder="0" /></td>
+          <td><button onclick="updatePoints('${student.id}', ${student.totalPoints})">Save</button></td>
+        `;
+        table.appendChild(row);
       });
+    }
 
-      alert("Student added!");
-      document.getElementById("studentName").value = "";
-      document.getElementById("studentImage").value = "";
-      document.getElementById("studentPoints").value = "";
+    async function updatePoints(id, currentPoints) {
+      const input = document.getElementById("pts-" + id);
+      const add = parseInt(input.value);
+      if (isNaN(add)) return;
+      const newTotal = currentPoints + add;
+      await updateDoc(doc(db, "students", id), {
+        totalPoints: newTotal
+      });
+      alert("✅ Points updated!");
       loadStudents();
     }
 
     async function addTask() {
       const name = document.getElementById("taskName").value.trim();
       const points = parseInt(document.getElementById("taskPoints").value);
+      const image = document.getElementById("taskImage").value.trim();
+      if (!name || isNaN(points) || !image) return alert("Please fill all fields.");
 
-      if (!name || isNaN(points)) {
-        alert("Please fill all task fields.");
-        return;
-      }
-
-      await addDoc(collection(db, "tasks"), {
-        name: name,
-        points: points
-      });
-
-      alert("Task added!");
+      await addDoc(tasksRef, { name, points, image });
+      alert("✅ Task added!");
       document.getElementById("taskName").value = "";
       document.getElementById("taskPoints").value = "";
+      document.getElementById("taskImage").value = "";
     }
 
     async function addGift() {
       const name = document.getElementById("giftName").value.trim();
       const cost = parseInt(document.getElementById("giftCost").value);
       const image = document.getElementById("giftImage").value.trim();
+      if (!name || isNaN(cost) || !image) return alert("Please fill all fields.");
 
-      if (!name || isNaN(cost) || !image) {
-        alert("Please fill all gift fields.");
-        return;
-      }
-
-      await addDoc(collection(db, "gifts"), {
-        name: name,
-        cost: cost,
-        image: image
-      });
-
-      alert("Gift added!");
+      await addDoc(giftsRef, { name, cost, image });
+      alert("🎁 Gift added!");
       document.getElementById("giftName").value = "";
       document.getElementById("giftCost").value = "";
       document.getElementById("giftImage").value = "";
-    }
-
-    let allStudents = [];
-
-    async function loadStudents() {
-      const snapshot = await getDocs(collection(db, "students"));
-      const container = document.getElementById("studentsList");
-      container.innerHTML = "";
-      allStudents = [];
-
-      snapshot.forEach(docSnap => {
-        const student = docSnap.data();
-        allStudents.push({ id: docSnap.id, ...student });
-
-        const div = document.createElement("div");
-        div.className = "student-item";
-        div.innerHTML = `
-          <label>
-            <input type="checkbox" value="${docSnap.id}" />
-            ${student.name} (${student.totalPoints} pts)
-          </label>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    async function updatePoints() {
-      const checkboxes = document.querySelectorAll("#studentsList input[type='checkbox']:checked");
-      const pointDelta = parseInt(document.getElementById("pointsToAdd").value);
-      if (checkboxes.length === 0 || isNaN(pointDelta)) {
-        alert("Select students and enter valid points.");
-        return;
-      }
-
-      for (let checkbox of checkboxes) {
-        const studentId = checkbox.value;
-        const student = allStudents.find(s => s.id === studentId);
-        const newPoints = student.totalPoints + pointDelta;
-
-        await updateDoc(doc(db, "students", studentId), {
-          totalPoints: newPoints
-        });
-      }
-
-      alert("Points updated!");
-      document.getElementById("pointsToAdd").value = "";
-      loadStudents();
     }
 
     loadStudents();
