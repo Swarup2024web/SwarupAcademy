@@ -4,105 +4,97 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Leaderboard</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- 🌸 Header -->
   <div class="header">
-    <!-- Row 1: Login Input -->
+    <!-- Row 1: Login -->
     <div class="header-row">
-      <input type="text" id="loginInput" placeholder="Enter your name and click GO" onkeydown="if(event.key==='Enter') loginUser()" />
+      <input type="text" id="nameInput" placeholder="Enter your name and click Go" onkeydown="handleKey(event)">
     </div>
 
-    <!-- Row 2: Points and Level -->
-    <div class="header-row">
-      <div class="level-box">
-        Points: <span id="pointDisplay">0</span> |
-        Level: <span id="levelDisplay">0</span>
-      </div>
-    </div>
+    <!-- Row 2: Points & Level -->
+    <div class="level-box" id="userStats">Not logged in</div>
 
     <!-- Row 3: Nav Tabs -->
     <div class="nav-tabs">
-      <a href="leaderboard.html"><i class="fas fa-trophy"></i></a>
-      <a href="tasks.html"><i class="fas fa-tasks"></i></a>
-      <a href="gifts.html"><i class="fas fa-gift"></i></a>
+      <a href="leaderboard.html" title="Leaderboard">🏆</a>
+      <a href="tasks.html" title="Tasks">📋</a>
+      <a href="gifts.html" title="Gifts">🎁</a>
     </div>
   </div>
 
-  <h2 style="text-align: center; margin-top: 20px;">🏆 Leaderboard</h2>
-  <div id="leaderboardContainer"></div>
+  <!-- 🏆 Leaderboard List -->
+  <div id="leaderboardContainer" class="gift-list"></div>
 
   <!-- Firebase + Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, collection, getDocs, query, where
+      getFirestore, collection, getDocs
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const imageBase = "https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/";
 
     let currentUser = null;
+    let students = [];
 
-    const levelChart = [
-      { level: 1, points: 100 },
-      { level: 2, points: 500 },
-      { level: 3, points: 800 },
-      { level: 4, points: 1200 },
-      { level: 5, points: 1600 },
-    ];
-
-    function calculateLevel(totalPoints) {
-      let level = 0;
-      for (let entry of levelChart) {
-        if (totalPoints >= entry.points) level = entry.level;
-        else break;
-      }
-      return level;
+    function handleKey(e) {
+      if (e.key === "Enter") login();
     }
 
-    async function loginUser() {
-      const name = document.getElementById("loginInput").value.trim();
-      if (!name) return alert("Enter name");
+    async function login() {
+      const inputName = document.getElementById("nameInput").value.trim().toLowerCase();
+      if (!inputName) return;
 
-      const q = query(collection(db, "students"), where("name", "==", name));
-      const snapshot = await getDocs(q);
+      const match = students.find(s => s.name.toLowerCase() === inputName);
+      if (!match) {
+        alert("Student not found");
+        return;
+      }
 
-      if (snapshot.empty) return alert("No student found.");
+      currentUser = match;
+      document.getElementById("nameInput").value = "";
+      document.getElementById("nameInput").placeholder = match.name;
+      updateUserStats();
+    }
 
-      snapshot.forEach(docSnap => {
-        currentUser = docSnap.data();
-      });
+    function calculateLevel(totalPoints) {
+      if (totalPoints >= 800) return 3;
+      if (totalPoints >= 500) return 2;
+      if (totalPoints >= 100) return 1;
+      return 0;
+    }
 
-      document.getElementById("loginInput").placeholder = currentUser.name;
-      document.getElementById("loginInput").value = "";
-      document.getElementById("pointDisplay").textContent = currentUser.totalPoints;
-      document.getElementById("levelDisplay").textContent = calculateLevel(currentUser.totalPoints);
+    function updateUserStats() {
+      if (!currentUser) return;
+      const level = calculateLevel(currentUser.totalPoints);
+      document.getElementById("userStats").innerHTML = `
+        ${currentUser.totalPoints} pts | Level ${level}
+      `;
     }
 
     async function loadLeaderboard() {
       const snapshot = await getDocs(collection(db, "students"));
-      const students = [];
-
-      snapshot.forEach(doc => {
-        students.push(doc.data());
-      });
+      students = [];
+      snapshot.forEach(doc => students.push(doc.data()));
 
       students.sort((a, b) => b.totalPoints - a.totalPoints);
 
       const container = document.getElementById("leaderboardContainer");
-      container.innerHTML = students.map((student, index) => `
+      container.innerHTML = students.map((s, i) => `
         <div class="leaderboard-entry">
-          <div class="rank">${index + 1}</div>
-          <img src="${student.image}" alt="${student.name}" />
+          <div class="rank">${i + 1}</div>
+          <img src="${imageBase + s.image}" alt="${s.name}" />
           <div class="info">
-            <h4>${student.name}</h4>
-            <p>Points: ${student.totalPoints}</p>
-            <p>Level: ${calculateLevel(student.totalPoints)}</p>
+            <h4>${s.name}</h4>
+            <p>Points: ${s.totalPoints}</p>
+            <p>Level: ${calculateLevel(s.totalPoints)}</p>
           </div>
         </div>
       `).join('');
@@ -110,6 +102,5 @@
 
     loadLeaderboard();
   </script>
-
 </body>
 </html>
