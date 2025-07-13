@@ -4,137 +4,140 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gifts</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- 🎀 Header -->
   <div class="header">
-    <!-- Row 1: Login Input -->
+    <!-- Row 1: Login -->
     <div class="header-row">
-      <input type="text" id="loginInput" placeholder="Enter your name and click GO" onkeydown="if(event.key==='Enter') loginUser()" />
+      <input type="text" id="nameInput" placeholder="Enter your name and click Go" onkeydown="handleKey(event)">
     </div>
 
-    <!-- Row 2: Points and Level -->
-    <div class="header-row">
-      <div class="level-box">
-        Points: <span id="pointDisplay">0</span> |
-        Level: <span id="levelDisplay">0</span>
-      </div>
-    </div>
+    <!-- Row 2: Points & Level -->
+    <div class="level-box" id="userStats">Not logged in</div>
 
-    <!-- Row 3: Navigation Tabs -->
+    <!-- Row 3: Nav Tabs -->
     <div class="nav-tabs">
-      <a href="leaderboard.html"><i class="fas fa-trophy"></i></a>
-      <a href="tasks.html"><i class="fas fa-tasks"></i></a>
-      <a href="gifts.html"><i class="fas fa-gift"></i></a>
+      <a href="leaderboard.html" title="Leaderboard">🏆</a>
+      <a href="tasks.html" title="Tasks">📋</a>
+      <a href="gifts.html" title="Gifts">🎁</a>
     </div>
   </div>
 
-  <h2 style="text-align:center; margin-top: 20px;">🎁 Available Gifts</h2>
-  <div id="giftContainer" class="gift-list"></div>
+  <!-- 🎁 Gift List -->
+  <div class="gift-list" id="giftContainer">Loading gifts...</div>
 
   <!-- Firebase + Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, collection, getDocs, query, where, doc, updateDoc
+      getFirestore, collection, getDocs, doc, updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const imageBase = "https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/";
 
     let currentUser = null;
-    let currentUserDocId = null;
+    let students = [];
+    let gifts = [];
 
-    const levelChart = [
-      { level: 1, points: 100 },
-      { level: 2, points: 500 },
-      { level: 3, points: 800 },
-      { level: 4, points: 1200 },
-      { level: 5, points: 1600 },
-    ];
-
-    function calculateLevel(points) {
-      let level = 0;
-      for (const item of levelChart) {
-        if (points >= item.points) level = item.level;
-        else break;
-      }
-      return level;
+    function handleKey(e) {
+      if (e.key === "Enter") login();
     }
 
-    async function loginUser() {
-      const name = document.getElementById("loginInput").value.trim();
-      if (!name) return alert("Enter your name");
+    async function login() {
+      const inputName = document.getElementById("nameInput").value.trim().toLowerCase();
+      if (!inputName) return;
 
-      const q = query(collection(db, "students"), where("name", "==", name));
-      const snap = await getDocs(q);
-
-      if (snap.empty) return alert("Student not found");
-
-      snap.forEach(docSnap => {
-        currentUser = docSnap.data();
-        currentUserDocId = docSnap.id;
-      });
-
-      document.getElementById("loginInput").placeholder = currentUser.name;
-      document.getElementById("loginInput").value = "";
-      document.getElementById("pointDisplay").textContent = currentUser.totalPoints;
-      document.getElementById("levelDisplay").textContent = calculateLevel(currentUser.totalPoints);
-
-      loadGifts();
-    }
-
-    async function loadGifts() {
-      const container = document.getElementById("giftContainer");
-      container.innerHTML = "";
-
-      const snapshot = await getDocs(collection(db, "gifts"));
-      if (snapshot.empty) {
-        container.innerHTML = "<p style='text-align:center;'>No gifts available.</p>";
+      const match = students.find(s => s.name.toLowerCase() === inputName);
+      if (!match) {
+        alert("Student not found");
         return;
       }
 
-      snapshot.forEach(docSnap => {
-        const gift = docSnap.data();
+      currentUser = match;
+      document.getElementById("nameInput").value = "";
+      document.getElementById("nameInput").placeholder = match.name;
+      updateUserStats();
+      renderGifts();
+    }
 
+    function calculateLevel(totalPoints) {
+      if (totalPoints >= 800) return 3;
+      if (totalPoints >= 500) return 2;
+      if (totalPoints >= 100) return 1;
+      return 0;
+    }
+
+    function updateUserStats() {
+      if (!currentUser) return;
+      const level = calculateLevel(currentUser.totalPoints);
+      const available = currentUser.totalPoints - currentUser.pointsSpent;
+      document.getElementById("userStats").innerHTML = `
+        ${available} pts | Level ${level}
+      `;
+    }
+
+    async function loadGifts() {
+      const snapshot = await getDocs(collection(db, "gifts"));
+      gifts = [];
+      snapshot.forEach(doc => gifts.push({ id: doc.id, ...doc.data() }));
+      renderGifts();
+    }
+
+    async function loadStudents() {
+      const snapshot = await getDocs(collection(db, "students"));
+      students = [];
+      snapshot.forEach(doc => {
+        students.push({ id: doc.id, ...doc.data() });
+      });
+    }
+
+    function renderGifts() {
+      const container = document.getElementById("giftContainer");
+      container.innerHTML = "";
+
+      gifts.forEach(gift => {
         const div = document.createElement("div");
         div.className = "gift-card";
         div.innerHTML = `
-          <img src="${gift.image}" alt="${gift.name}" />
+          <img src="${imageBase + gift.image}" alt="${gift.name}">
           <h4>${gift.name}</h4>
           <p>Cost: ${gift.cost} pts</p>
+          ${canRedeem(gift) ? `<button onclick="redeem('${gift.id}', ${gift.cost})">Redeem</button>` : ""}
         `;
-
-        if (currentUser && currentUser.totalPoints >= gift.cost) {
-          const btn = document.createElement("button");
-          btn.textContent = "Redeem";
-          btn.onclick = () => redeemGift(gift.cost, gift.name);
-          div.appendChild(btn);
-        }
-
         container.appendChild(div);
       });
     }
 
-    async function redeemGift(cost, giftName) {
-      if (!currentUser || !currentUserDocId) return;
+    function canRedeem(gift) {
+      if (!currentUser) return false;
+      const available = currentUser.totalPoints - currentUser.pointsSpent;
+      return available >= gift.cost;
+    }
 
-      const newPoints = currentUser.totalPoints - cost;
-      await updateDoc(doc(db, "students", currentUserDocId), {
-        totalPoints: newPoints,
-        pointsSpent: (currentUser.pointsSpent || 0) + cost
+    async function redeem(giftId, cost) {
+      if (!currentUser) return;
+
+      const newSpent = currentUser.pointsSpent + cost;
+      await updateDoc(doc(db, "students", currentUser.id), {
+        pointsSpent: newSpent
       });
 
-      alert(`🎉 You redeemed "${giftName}". Collect it from your teacher.`);
-      currentUser.totalPoints = newPoints;
-      document.getElementById("pointDisplay").textContent = newPoints;
-      document.getElementById("levelDisplay").textContent = calculateLevel(newPoints);
-      loadGifts();
+      currentUser.pointsSpent = newSpent;
+      updateUserStats();
+      renderGifts();
+
+      alert("🎉 Redemption successful! Please collect the gift from your teacher.");
     }
+
+    // Init
+    await loadStudents();
+    await loadGifts();
   </script>
 </body>
 </html>
