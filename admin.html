@@ -1,172 +1,261 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f1f7ff;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0faff;
+      color: #003366;
+    }
+
+    h2 {
+      text-align: center;
+      margin: 24px 0 10px;
+      color: #004488;
+    }
+
+    .section {
+      max-width: 900px;
+      margin: 0 auto;
       padding: 20px;
     }
 
-    h1 {
-      text-align: center;
-      color: #003366;
+    .box {
+      background: white;
+      border: 2px solid #cce7ff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .box label {
+      font-weight: bold;
+    }
+
+    .box input[type="text"],
+    .box input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px 0;
+      border: 2px solid #0077cc;
+      border-radius: 8px;
+    }
+
+    .box button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .box button:hover {
+      background: #005fa3;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      margin-top: 15px;
     }
 
     th, td {
-      padding: 12px;
-      border: 1px solid #ccc;
+      padding: 10px;
+      border: 1px solid #ddd;
       text-align: center;
+      font-size: 15px;
     }
 
     th {
-      background-color: #0077cc;
-      color: white;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f0f8ff;
-    }
-
-    input[type="number"] {
-      width: 80px;
-      padding: 5px;
-    }
-
-    .update-box {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .update-box input {
-      padding: 8px;
-      font-size: 16px;
-    }
-
-    .update-btn {
-      padding: 10px 20px;
       background: #0077cc;
       color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
     }
 
-    .update-btn:hover {
-      background: #005fa3;
+    .update-input {
+      width: 80px;
+      padding: 6px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #0077cc;
+    }
+
+    @media (max-width: 600px) {
+      .box input, .box button, .update-input {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      th, td {
+        padding: 8px;
+      }
     }
   </style>
 </head>
+
 <body>
+  <h2>Admin Panel</h2>
+  <div class="section">
 
-<h1>Admin Panel: Manual Points Update</h1>
+    <!-- Add Student -->
+    <div class="box">
+      <h3>➕ Add New Student</h3>
+      <label>Student Name</label>
+      <input type="text" id="studentName" placeholder="Name" />
+      <label>Image (e.g. dip.png)</label>
+      <input type="text" id="studentImage" placeholder="Image filename" />
+      <label>Initial Total Points</label>
+      <input type="number" id="studentPoints" placeholder="0" />
+      <button onclick="addStudent()">Add Student</button>
+    </div>
 
-<table id="studentTable">
-  <thead>
-    <tr>
-      <th>Select</th>
-      <th>Name</th>
-      <th>Total Points</th>
-    </tr>
-  </thead>
-  <tbody id="tableBody">
-    <!-- Filled by JS -->
-  </tbody>
-</table>
+    <!-- Update Points -->
+    <div class="box">
+      <h3>🧮 Update Points</h3>
+      <table id="studentsTable">
+        <thead>
+          <tr><th>Name</th><th>Total Points</th><th>Add Points</th></tr>
+        </thead>
+        <tbody id="studentsBody"></tbody>
+      </table>
+      <br />
+      <button onclick="updatePoints()">Save Updates</button>
+    </div>
 
-<div class="update-box">
-  <input type="number" id="pointsInput" placeholder="Enter points">
-  <button class="update-btn" onclick="updatePoints()">Update Points</button>
-</div>
+    <!-- Task Management -->
+    <div class="box">
+      <h3>📋 Add New Task</h3>
+      <label>Task Name</label>
+      <input type="text" id="taskName" placeholder="Task name" />
+      <label>Points</label>
+      <input type="number" id="taskPoints" placeholder="e.g. 50" />
+      <button onclick="addTask()">Add Task</button>
+    </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  import { firebaseConfig } from "./firebaseConfig.js";
+    <!-- Gift Management -->
+    <div class="box">
+      <h3>🎁 Add New Gift</h3>
+      <label>Gift Name</label>
+      <input type="text" id="giftName" placeholder="Gift name" />
+      <label>Image Filename (e.g. pen.png)</label>
+      <input type="text" id="giftImage" placeholder="pen.png" />
+      <label>Cost in Points</label>
+      <input type="number" id="giftCost" placeholder="e.g. 200" />
+      <button onclick="addGift()">Add Gift</button>
+    </div>
+  </div>
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  <!-- FIREBASE + SCRIPT -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { firebaseConfig } from "./firebaseConfig.js";
 
-  let students = [];
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  async function loadStudents() {
-    const snap = await getDocs(collection(db, "students"));
-    students = snap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    renderTable();
-  }
+    const studentCol = collection(db, "students");
+    const taskCol = collection(db, "tasks");
+    const giftCol = collection(db, "gifts");
 
-  function renderTable() {
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
-
-    students.forEach((student, index) => {
-      const tr = document.createElement("tr");
-
-      const tdCheck = document.createElement("td");
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.dataset.index = index;
-      tdCheck.appendChild(checkbox);
-
-      const tdName = document.createElement("td");
-      tdName.textContent = student.name;
-
-      const tdPoints = document.createElement("td");
-      tdPoints.textContent = student.totalPoints;
-
-      tr.appendChild(tdCheck);
-      tr.appendChild(tdName);
-      tr.appendChild(tdPoints);
-
-      tbody.appendChild(tr);
-    });
-  }
-
-  async function updatePoints() {
-    const value = parseInt(document.getElementById("pointsInput").value);
-    if (isNaN(value)) {
-      alert("❌ Please enter a valid number.");
-      return;
-    }
-
-    const checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
-    if (checkboxes.length === 0) {
-      alert("❌ Please select at least one student.");
-      return;
-    }
-
-    for (const checkbox of checkboxes) {
-      const index = parseInt(checkbox.dataset.index);
-      const student = students[index];
-      const newTotal = student.totalPoints + value;
-
-      await updateDoc(doc(db, "students", student.id), {
-        totalPoints: newTotal
+    async function loadStudents() {
+      const snapshot = await getDocs(studentCol);
+      const tbody = document.getElementById("studentsBody");
+      tbody.innerHTML = "";
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${data.name}</td>
+          <td>${data.totalPoints || 0}</td>
+          <td><input type="number" class="update-input" data-id="${docSnap.id}" placeholder="+pts" /></td>
+        `;
+        tbody.appendChild(tr);
       });
     }
 
-    alert("✅ Points updated successfully!");
+    window.addStudent = async function () {
+      const name = document.getElementById("studentName").value.trim();
+      const image = document.getElementById("studentImage").value.trim();
+      const points = parseInt(document.getElementById("studentPoints").value) || 0;
+
+      if (!name || !image) return alert("Enter name and image.");
+
+      await addDoc(studentCol, {
+        name,
+        image: `https://raw.githubusercontent.com/Swarup2024web/newswarup/main/storage/assets/${image}`,
+        totalPoints: points,
+        pointsSpent: 0
+      });
+
+      alert("Student added!");
+      document.getElementById("studentName").value = "";
+      document.getElementById("studentImage").value = "";
+      document.getElementById("studentPoints").value = "";
+      loadStudents();
+    };
+
+    window.updatePoints = async function () {
+      const inputs = document.querySelectorAll(".update-input");
+      for (let input of inputs) {
+        const value = parseInt(input.value);
+        const id = input.getAttribute("data-id");
+        if (!isNaN(value) && value !== 0) {
+          const ref = doc(db, "students", id);
+          const current = (await getDocs(studentCol)).docs.find(d => d.id === id).data().totalPoints || 0;
+          await updateDoc(ref, { totalPoints: current + value });
+        }
+      }
+      alert("Points updated!");
+      loadStudents();
+    };
+
+    window.addTask = async function () {
+      const name = document.getElementById("taskName").value.trim();
+      const points = parseInt(document.getElementById("taskPoints").value) || 0;
+      if (!name) return alert("Enter task name.");
+      await addDoc(taskCol, { name, points });
+      alert("Task added!");
+      document.getElementById("taskName").value = "";
+      document.getElementById("taskPoints").value = "";
+    };
+
+    window.addGift = async function () {
+      const name = document.getElementById("giftName").value.trim();
+      const image = document.getElementById("giftImage").value.trim();
+      const cost = parseInt(document.getElementById("giftCost").value) || 0;
+      if (!name || !image) return alert("Enter gift name and image.");
+      await addDoc(giftCol, {
+        name,
+        image: `https://raw.githubusercontent.com/Swarup2024web/newswarup/main/storage/assets/${image}`,
+        cost
+      });
+      alert("Gift added!");
+      document.getElementById("giftName").value = "";
+      document.getElementById("giftImage").value = "";
+      document.getElementById("giftCost").value = "";
+    };
+
     loadStudents();
-  }
-
-  loadStudents();
-</script>
-
+  </script>
 </body>
 </html>
