@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tasks</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- ✅ HEADER -->
+  <div class="header">
+    <!-- Row 1: Login -->
+    <div class="header-row">
+      <input id="nameInput" placeholder="Enter your name & press Enter" onkeypress="handleLogin(event)" />
+    </div>
+
+    <!-- Row 2: Points and Level -->
+    <div class="header-row">
+      <div class="level-box" id="statusDisplay">Not logged in</div>
+    </div>
+
+    <!-- Row 3: Tabs -->
+    <div class="nav-tabs">
+      <i class="fas fa-trophy" title="Leaderboard" onclick="window.location.href='leaderboard.html'"></i>
+      <i class="fas fa-tasks" title="Tasks"></i>
+      <i class="fas fa-gift" title="Gifts" onclick="window.location.href='gifts.html'"></i>
+    </div>
+  </div>
+
+  <!-- ✅ Tasks Section -->
+  <h2 style="text-align:center; margin-top: 30px;">📝 Available Tasks</h2>
+  <div id="taskContainer"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { firebaseConfig } from "./firebaseConfig.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let students = [];
+    let student = null;
+
+    async function loadStudents() {
+      const snap = await getDocs(collection(db, "students"));
+      students = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+
+    function getLevel(totalPoints) {
+      if (totalPoints >= 800) return 3;
+      if (totalPoints >= 500) return 2;
+      if (totalPoints >= 100) return 1;
+      return 0;
+    }
+
+    function handleLogin(e) {
+      if (e.key === "Enter") {
+        const name = e.target.value.trim().toLowerCase();
+        student = students.find(s => s.name.toLowerCase() === name);
+        const statusBox = document.getElementById("statusDisplay");
+
+        if (student) {
+          e.target.placeholder = student.name;
+          e.target.value = "";
+          const level = getLevel(student.totalPoints);
+          const left = student.totalPoints - (student.pointsSpent || 0);
+          statusBox.textContent = `${left} pts | Level ${level}`;
+        } else {
+          statusBox.textContent = "❌ Not Found";
+        }
+      }
+    }
+
+    async function loadTasks() {
+      const snap = await getDocs(collection(db, "tasks"));
+      const tasks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const container = document.getElementById("taskContainer");
+      container.innerHTML = "";
+
+      tasks.forEach(task => {
+        const card = document.createElement("div");
+        card.className = "task-card";
+
+        const title = document.createElement("h4");
+        title.textContent = task.name;
+
+        const pts = document.createElement("p");
+        pts.textContent = `Points: ${task.points}`;
+
+        card.appendChild(title);
+        card.appendChild(pts);
+        container.appendChild(card);
+      });
+    }
+
+    await loadStudents();
+    await loadTasks();
+  </script>
+</body>
+</html>
