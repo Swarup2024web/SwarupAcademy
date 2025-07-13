@@ -8,17 +8,17 @@
 </head>
 <body>
 
-  <!-- 🌸 Header -->
+  <!-- 🌸 HEADER -->
   <div class="header">
-    <!-- Row 1: Login -->
+    <!-- Row 1: Name input for login -->
     <div class="header-row">
-      <input type="text" id="nameInput" placeholder="Enter your name and click Go" onkeydown="handleKey(event)">
+      <input type="text" id="nameInput" placeholder="Enter your name and press Enter" onkeydown="handleKey(event)">
     </div>
 
     <!-- Row 2: Points & Level -->
     <div class="level-box" id="userStats">Not logged in</div>
 
-    <!-- Row 3: Nav Tabs -->
+    <!-- Row 3: Navigation Tabs -->
     <div class="nav-tabs">
       <a href="leaderboard.html" title="Leaderboard">🏆</a>
       <a href="tasks.html" title="Tasks">📋</a>
@@ -26,8 +26,10 @@
     </div>
   </div>
 
-  <!-- 🏆 Leaderboard List -->
-  <div id="leaderboardContainer" class="gift-list"></div>
+  <!-- 🏆 LEADERBOARD LIST -->
+  <div class="leaderboard" id="leaderboardContainer">
+    Loading leaderboard...
+  </div>
 
   <!-- Firebase + Script -->
   <script type="module">
@@ -41,63 +43,69 @@
     const db = getFirestore(app);
     const imageBase = "https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/";
 
-    let currentUser = null;
     let students = [];
+    let currentUser = null;
+
+    // Calculate level from total points
+    function calculateLevel(points) {
+      if (points >= 800) return 3;
+      if (points >= 500) return 2;
+      if (points >= 100) return 1;
+      return 0;
+    }
 
     function handleKey(e) {
       if (e.key === "Enter") login();
     }
 
-    async function login() {
+    function login() {
       const inputName = document.getElementById("nameInput").value.trim().toLowerCase();
       if (!inputName) return;
 
-      const match = students.find(s => s.name.toLowerCase() === inputName);
-      if (!match) {
-        alert("Student not found");
+      const found = students.find(s => s.name.toLowerCase() === inputName);
+      if (!found) {
+        alert("Student not found!");
         return;
       }
 
-      currentUser = match;
+      currentUser = found;
       document.getElementById("nameInput").value = "";
-      document.getElementById("nameInput").placeholder = match.name;
-      updateUserStats();
-    }
+      document.getElementById("nameInput").placeholder = found.name;
 
-    function calculateLevel(totalPoints) {
-      if (totalPoints >= 800) return 3;
-      if (totalPoints >= 500) return 2;
-      if (totalPoints >= 100) return 1;
-      return 0;
-    }
+      const availablePoints = found.totalPoints - found.pointsSpent;
+      const level = calculateLevel(found.totalPoints);
 
-    function updateUserStats() {
-      if (!currentUser) return;
-      const level = calculateLevel(currentUser.totalPoints);
-      document.getElementById("userStats").innerHTML = `
-        ${currentUser.totalPoints} pts | Level ${level}
-      `;
+      document.getElementById("userStats").innerText = `${availablePoints} pts | Level ${level}`;
     }
 
     async function loadLeaderboard() {
       const snapshot = await getDocs(collection(db, "students"));
       students = [];
-      snapshot.forEach(doc => students.push(doc.data()));
+
+      snapshot.forEach(doc => {
+        students.push({ id: doc.id, ...doc.data() });
+      });
 
       students.sort((a, b) => b.totalPoints - a.totalPoints);
 
       const container = document.getElementById("leaderboardContainer");
-      container.innerHTML = students.map((s, i) => `
-        <div class="leaderboard-entry">
-          <div class="rank">${i + 1}</div>
+      container.innerHTML = "";
+
+      students.forEach((s, index) => {
+        const level = calculateLevel(s.totalPoints);
+        const row = document.createElement("div");
+        row.className = "leaderboard-entry";
+        row.innerHTML = `
+          <div class="rank">#${index + 1}</div>
           <img src="${imageBase + s.image}" alt="${s.name}" />
           <div class="info">
             <h4>${s.name}</h4>
             <p>Points: ${s.totalPoints}</p>
-            <p>Level: ${calculateLevel(s.totalPoints)}</p>
+            <p>Level: ${level}</p>
           </div>
-        </div>
-      `).join('');
+        `;
+        container.appendChild(row);
+      });
     }
 
     loadLeaderboard();
