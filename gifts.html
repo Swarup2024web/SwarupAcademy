@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gifts</title>
   <link rel="stylesheet" href="style.css"/>
@@ -11,12 +11,12 @@
 
   <!-- Header -->
   <div class="header">
-    <!-- Row 1: Login -->
+    <!-- Row 1: Login Input -->
     <div class="header-row">
       <input type="text" id="loginInput" placeholder="Enter your name and click GO" onkeydown="if(event.key==='Enter') loginUser()" />
     </div>
 
-    <!-- Row 2: Points + Level -->
+    <!-- Row 2: Points and Level -->
     <div class="header-row">
       <div class="level-box">
         Points: <span id="pointDisplay">0</span> |
@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <!-- Row 3: Nav Tabs -->
+    <!-- Row 3: Navigation Tabs -->
     <div class="nav-tabs">
       <a href="leaderboard.html"><i class="fas fa-trophy"></i></a>
       <a href="tasks.html"><i class="fas fa-tasks"></i></a>
@@ -32,15 +32,14 @@
     </div>
   </div>
 
-  <!-- Main Content -->
-  <h2>Available Gifts</h2>
-  <div id="giftContainer"></div>
+  <h2 style="text-align:center; margin-top: 20px;">🎁 Available Gifts</h2>
+  <div id="giftContainer" class="gift-list"></div>
 
-  <!-- FIREBASE + SCRIPT -->
+  <!-- Firebase + Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
-      getFirestore, collection, getDocs, doc, updateDoc, query, where, getDoc
+      getFirestore, collection, getDocs, query, where, doc, updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
@@ -58,10 +57,10 @@
       { level: 5, points: 1600 },
     ];
 
-    function calculateLevel(totalPoints) {
+    function calculateLevel(points) {
       let level = 0;
-      for (let entry of levelChart) {
-        if (totalPoints >= entry.points) level = entry.level;
+      for (const item of levelChart) {
+        if (points >= item.points) level = item.level;
         else break;
       }
       return level;
@@ -69,19 +68,18 @@
 
     async function loginUser() {
       const name = document.getElementById("loginInput").value.trim();
-      if (!name) return alert("Enter name");
+      if (!name) return alert("Enter your name");
 
       const q = query(collection(db, "students"), where("name", "==", name));
-      const snapshot = await getDocs(q);
+      const snap = await getDocs(q);
 
-      if (snapshot.empty) return alert("No student found.");
+      if (snap.empty) return alert("Student not found");
 
-      snapshot.forEach(docSnap => {
+      snap.forEach(docSnap => {
         currentUser = docSnap.data();
         currentUserDocId = docSnap.id;
       });
 
-      // Update UI
       document.getElementById("loginInput").placeholder = currentUser.name;
       document.getElementById("loginInput").value = "";
       document.getElementById("pointDisplay").textContent = currentUser.totalPoints;
@@ -93,12 +91,19 @@
     async function loadGifts() {
       const container = document.getElementById("giftContainer");
       container.innerHTML = "";
+
       const snapshot = await getDocs(collection(db, "gifts"));
+      if (snapshot.empty) {
+        container.innerHTML = "<p style='text-align:center;'>No gifts available.</p>";
+        return;
+      }
+
       snapshot.forEach(docSnap => {
         const gift = docSnap.data();
-        const giftEl = document.createElement("div");
-        giftEl.className = "gift-card";
-        giftEl.innerHTML = `
+
+        const div = document.createElement("div");
+        div.className = "gift-card";
+        div.innerHTML = `
           <img src="${gift.image}" alt="${gift.name}" />
           <h4>${gift.name}</h4>
           <p>Cost: ${gift.cost} pts</p>
@@ -107,32 +112,29 @@
         if (currentUser && currentUser.totalPoints >= gift.cost) {
           const btn = document.createElement("button");
           btn.textContent = "Redeem";
-          btn.onclick = () => redeemGift(docSnap.id, gift.cost, gift.name);
-          giftEl.appendChild(btn);
+          btn.onclick = () => redeemGift(gift.cost, gift.name);
+          div.appendChild(btn);
         }
 
-        container.appendChild(giftEl);
+        container.appendChild(div);
       });
     }
 
-    async function redeemGift(giftId, cost, name) {
+    async function redeemGift(cost, giftName) {
       if (!currentUser || !currentUserDocId) return;
-      const newPoints = currentUser.totalPoints - cost;
 
+      const newPoints = currentUser.totalPoints - cost;
       await updateDoc(doc(db, "students", currentUserDocId), {
         totalPoints: newPoints,
         pointsSpent: (currentUser.pointsSpent || 0) + cost
       });
 
-      alert(`You redeemed "${name}". Please collect from your teacher.`);
+      alert(`🎉 You redeemed "${giftName}". Collect it from your teacher.`);
       currentUser.totalPoints = newPoints;
       document.getElementById("pointDisplay").textContent = newPoints;
       document.getElementById("levelDisplay").textContent = calculateLevel(newPoints);
       loadGifts();
     }
-
-    // If already logged in from storage (optional future feature)
-    // loginUser("Dip");
   </script>
 </body>
 </html>
