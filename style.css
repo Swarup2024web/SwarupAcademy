@@ -209,3 +209,88 @@ img.avatar {
   color: #333;
   font-weight: bold;
 }
+/* === RESPONSIVENESS === */
+@media (max-width: 768px) {
+  .header input {
+    width: 90%;
+    font-size: 15px;
+  }
+
+  .level-box {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  .nav-tabs {
+    gap: 25px;
+  }
+
+  .nav-tabs i {
+    font-size: 20px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+
+  .gift-card,
+  .task-card {
+    width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .nav-tabs {
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 8px 0;
+  }
+
+  .gift-card,
+  .task-card {
+    width: 95%;
+    font-size: 15px;
+  }
+
+  .gift-card h4,
+  .task-card h4 {
+    font-size: 18px;
+  }
+
+  .gift-card p,
+  .task-card p {
+    font-size: 14px;
+  }
+
+  .gift-card button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  table {
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .header input {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+  }
