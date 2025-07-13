@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f7ff;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #003366;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    th {
+      background-color: #0077cc;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f0f8ff;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      padding: 5px;
+    }
+
+    .update-box {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .update-box input {
+      padding: 8px;
+      font-size: 16px;
+    }
+
+    .update-btn {
+      padding: 10px 20px;
+      background: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .update-btn:hover {
+      background: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Admin Panel: Manual Points Update</h1>
+
+<table id="studentTable">
+  <thead>
+    <tr>
+      <th>Select</th>
+      <th>Name</th>
+      <th>Total Points</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody">
+    <!-- Filled by JS -->
+  </tbody>
+</table>
+
+<div class="update-box">
+  <input type="number" id="pointsInput" placeholder="Enter points">
+  <button class="update-btn" onclick="updatePoints()">Update Points</button>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { firebaseConfig } from "./firebaseConfig.js";
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let students = [];
+
+  async function loadStudents() {
+    const snap = await getDocs(collection(db, "students"));
+    students = snap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    renderTable();
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    students.forEach((student, index) => {
+      const tr = document.createElement("tr");
+
+      const tdCheck = document.createElement("td");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.dataset.index = index;
+      tdCheck.appendChild(checkbox);
+
+      const tdName = document.createElement("td");
+      tdName.textContent = student.name;
+
+      const tdPoints = document.createElement("td");
+      tdPoints.textContent = student.totalPoints;
+
+      tr.appendChild(tdCheck);
+      tr.appendChild(tdName);
+      tr.appendChild(tdPoints);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function updatePoints() {
+    const value = parseInt(document.getElementById("pointsInput").value);
+    if (isNaN(value)) {
+      alert("❌ Please enter a valid number.");
+      return;
+    }
+
+    const checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+    if (checkboxes.length === 0) {
+      alert("❌ Please select at least one student.");
+      return;
+    }
+
+    for (const checkbox of checkboxes) {
+      const index = parseInt(checkbox.dataset.index);
+      const student = students[index];
+      const newTotal = student.totalPoints + value;
+
+      await updateDoc(doc(db, "students", student.id), {
+        totalPoints: newTotal
+      });
+    }
+
+    alert("✅ Points updated successfully!");
+    loadStudents();
+  }
+
+  loadStudents();
+</script>
+
+</body>
+</html>
