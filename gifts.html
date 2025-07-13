@@ -4,21 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gifts</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- 🎀 Header -->
+  <!-- 🌸 HEADER -->
   <div class="header">
-    <!-- Row 1: Login -->
+    <!-- Row 1: Name input for login -->
     <div class="header-row">
-      <input type="text" id="nameInput" placeholder="Enter your name and click Go" onkeydown="handleKey(event)">
+      <input type="text" id="nameInput" placeholder="Enter your name and press Enter" onkeydown="handleKey(event)">
     </div>
 
     <!-- Row 2: Points & Level -->
     <div class="level-box" id="userStats">Not logged in</div>
 
-    <!-- Row 3: Nav Tabs -->
+    <!-- Row 3: Navigation Tabs -->
     <div class="nav-tabs">
       <a href="leaderboard.html" title="Leaderboard">🏆</a>
       <a href="tasks.html" title="Tasks">📋</a>
@@ -26,8 +26,8 @@
     </div>
   </div>
 
-  <!-- 🎁 Gift List -->
-  <div class="gift-list" id="giftContainer">Loading gifts...</div>
+  <!-- 🎁 Gift Grid -->
+  <div class="gift-grid" id="giftContainer">Loading gifts...</div>
 
   <!-- Firebase + Script -->
   <script type="module">
@@ -41,52 +41,44 @@
     const db = getFirestore(app);
     const imageBase = "https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/";
 
-    let currentUser = null;
     let students = [];
+    let currentUser = null;
     let gifts = [];
+
+    function calculateLevel(points) {
+      if (points >= 800) return 3;
+      if (points >= 500) return 2;
+      if (points >= 100) return 1;
+      return 0;
+    }
 
     function handleKey(e) {
       if (e.key === "Enter") login();
     }
 
-    async function login() {
-      const inputName = document.getElementById("nameInput").value.trim().toLowerCase();
-      if (!inputName) return;
+    function login() {
+      const input = document.getElementById("nameInput").value.trim().toLowerCase();
+      if (!input) return;
 
-      const match = students.find(s => s.name.toLowerCase() === inputName);
-      if (!match) {
-        alert("Student not found");
+      const found = students.find(s => s.name.toLowerCase() === input);
+      if (!found) {
+        alert("Student not found.");
         return;
       }
 
-      currentUser = match;
+      currentUser = found;
       document.getElementById("nameInput").value = "";
-      document.getElementById("nameInput").placeholder = match.name;
+      document.getElementById("nameInput").placeholder = found.name;
+
       updateUserStats();
       renderGifts();
-    }
-
-    function calculateLevel(totalPoints) {
-      if (totalPoints >= 800) return 3;
-      if (totalPoints >= 500) return 2;
-      if (totalPoints >= 100) return 1;
-      return 0;
     }
 
     function updateUserStats() {
       if (!currentUser) return;
       const level = calculateLevel(currentUser.totalPoints);
       const available = currentUser.totalPoints - currentUser.pointsSpent;
-      document.getElementById("userStats").innerHTML = `
-        ${available} pts | Level ${level}
-      `;
-    }
-
-    async function loadGifts() {
-      const snapshot = await getDocs(collection(db, "gifts"));
-      gifts = [];
-      snapshot.forEach(doc => gifts.push({ id: doc.id, ...doc.data() }));
-      renderGifts();
+      document.getElementById("userStats").innerText = `${available} pts | Level ${level}`;
     }
 
     async function loadStudents() {
@@ -97,6 +89,15 @@
       });
     }
 
+    async function loadGifts() {
+      const snapshot = await getDocs(collection(db, "gifts"));
+      gifts = [];
+      snapshot.forEach(doc => {
+        gifts.push({ id: doc.id, ...doc.data() });
+      });
+      renderGifts();
+    }
+
     function renderGifts() {
       const container = document.getElementById("giftContainer");
       container.innerHTML = "";
@@ -105,7 +106,7 @@
         const div = document.createElement("div");
         div.className = "gift-card";
         div.innerHTML = `
-          <img src="${imageBase + gift.image}" alt="${gift.name}">
+          <img src="${imageBase + gift.image}" alt="${gift.name}" />
           <h4>${gift.name}</h4>
           <p>Cost: ${gift.cost} pts</p>
           ${canRedeem(gift) ? `<button onclick="redeem('${gift.id}', ${gift.cost})">Redeem</button>` : ""}
@@ -122,20 +123,16 @@
 
     async function redeem(giftId, cost) {
       if (!currentUser) return;
-
       const newSpent = currentUser.pointsSpent + cost;
       await updateDoc(doc(db, "students", currentUser.id), {
         pointsSpent: newSpent
       });
-
       currentUser.pointsSpent = newSpent;
       updateUserStats();
       renderGifts();
-
-      alert("🎉 Redemption successful! Please collect the gift from your teacher.");
+      alert("🎉 Gift redeemed! Collect from your teacher.");
     }
 
-    // Init
     await loadStudents();
     await loadGifts();
   </script>
