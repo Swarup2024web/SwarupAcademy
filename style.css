@@ -1,177 +1,151 @@
-/* General Reset */
+/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", sans-serif;
 }
 
+/* Body Base */
 body {
-  background: #f7fbfe;
-  color: #222;
+  font-family: "Segoe UI", sans-serif;
+  background: #fff0f6;
+  color: #333;
+  padding: 10px;
 }
 
-/* Header Design */
+/* Header Section */
 .header {
-  background: #e6f2ff;
-  padding: 10px;
-  border-bottom: 2px solid #b3d9ff;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  background: #ffe6f0;
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
 }
 
 /* Row 1: Login Input */
-.header-row input[type="text"] {
-  padding: 10px 15px;
-  border: 2px solid #b3d9ff;
-  border-radius: 10px;
-  font-size: 16px;
-  width: 100%;
-  max-width: 300px;
-  margin: auto;
-}
-
-/* Row 2: Points + Level */
-.level-box {
-  text-align: center;
-  font-weight: bold;
-  color: #005580;
-  font-size: 18px;
-}
-
-/* Row 3: Nav Tabs */
-.nav-tabs {
+.header .login {
   display: flex;
   justify-content: center;
-  gap: 40px;
-  font-size: 20px;
+  margin-bottom: 10px;
+}
+.header input[type="text"] {
+  padding: 8px 12px;
+  border: 1px solid #ff99c8;
+  border-radius: 20px;
+  width: 60%;
+  text-align: center;
+  font-size: 16px;
+  background: white;
 }
 
-.nav-tabs a {
-  color: #007acc;
+/* Row 2: Points and Level */
+.header .status {
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #d81b60;
+  font-weight: 600;
+}
+
+/* Row 3: Navigation Tabs (Icons Only) */
+.header .nav {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px dashed #f8b5c8;
+  padding-top: 10px;
+}
+.header .nav a {
+  color: #c2185b;
   text-decoration: none;
-  transition: 0.3s ease;
+  font-size: 22px;
+}
+.header .nav a:hover {
+  color: #e91e63;
 }
 
-.nav-tabs a:hover {
-  color: #004466;
-  transform: scale(1.1);
-}
-
-/* Gift / Task / Leaderboard Containers */
-.gift-list, .task-list, #leaderboardContainer {
-  max-width: 1000px;
-  margin: 30px auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
+/* Content Layouts */
+.container {
+  max-width: 900px;
+  margin: auto;
   padding: 10px;
 }
 
-/* Cards */
-.gift-card, .task-card, .leaderboard-entry {
-  background: #ffffff;
-  border: 2px solid #cceeff;
-  border-radius: 15px;
-  padding: 15px;
-  text-align: center;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Leaderboard Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(255, 153, 204, 0.2);
 }
-
-.gift-card:hover,
-.task-card:hover,
-.leaderboard-entry:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.gift-card img,
-.leaderboard-entry img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  margin-bottom: 10px;
-}
-
-/* Button Style */
-button {
-  padding: 8px 16px;
-  background: #0099cc;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s ease;
-}
-
-button:hover {
-  background: #0077aa;
-}
-
-/* Leaderboard Specific */
-.leaderboard-entry {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ffd6e8;
   text-align: left;
 }
-
-.leaderboard-entry .rank {
-  font-size: 24px;
-  font-weight: bold;
-  color: #006699;
-  min-width: 30px;
+th {
+  background: #ffc1e3;
+  color: #fff;
+  font-weight: 600;
 }
 
-.leaderboard-entry .info h4 {
-  margin: 0;
+/* Tasks and Gifts Card Layout */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(255, 182, 193, 0.2);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: scale(1.03);
+}
+.card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+.card h3 {
   font-size: 18px;
-  color: #004466;
+  color: #d81b60;
+  margin: 10px 0 5px;
 }
-
-.leaderboard-entry .info p {
-  margin: 3px 0;
+.card p {
   font-size: 14px;
+  color: #555;
+}
+.card button {
+  margin-top: 10px;
+  background: #f06292;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.card button:hover {
+  background: #d81b60;
 }
 
-/* Headings */
-h2 {
-  font-size: 26px;
-  color: #003366;
-  margin-bottom: 20px;
-}
-
-/* Mobile Responsive */
+/* Responsive Tweaks */
 @media (max-width: 600px) {
-  .nav-tabs {
-    gap: 20px;
-    font-size: 18px;
+  .header input[type="text"] {
+    width: 90%;
   }
 
-  .gift-card img,
-  .leaderboard-entry img {
-    width: 60px;
-    height: 60px;
+  .card img {
+    height: 140px;
   }
 
-  .header-row input[type="text"] {
-    max-width: 90%;
+  table, thead, tbody, th, td, tr {
     font-size: 14px;
-  }
-
-  .level-box {
-    font-size: 16px;
-  }
-
-  .leaderboard-entry {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
   }
 }
