@@ -1,160 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gifts</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
 
-  <!-- ✅ HEADER -->
+  <!-- Header -->
   <div class="header">
     <!-- Row 1: Login -->
     <div class="header-row">
-      <input id="nameInput" placeholder="Enter your name & press Enter" onkeypress="handleLogin(event)" />
+      <input type="text" id="loginInput" placeholder="Enter your name and click GO" onkeydown="if(event.key==='Enter') loginUser()" />
     </div>
 
-    <!-- Row 2: Points and Level -->
+    <!-- Row 2: Points + Level -->
     <div class="header-row">
-      <div class="level-box" id="statusDisplay">Not logged in</div>
+      <div class="level-box">
+        Points: <span id="pointDisplay">0</span> |
+        Level: <span id="levelDisplay">0</span>
+      </div>
     </div>
 
-    <!-- Row 3: Tabs -->
+    <!-- Row 3: Nav Tabs -->
     <div class="nav-tabs">
-      <i class="fas fa-trophy" title="Leaderboard" onclick="window.location.href='leaderboard.html'"></i>
-      <i class="fas fa-tasks" title="Tasks" onclick="window.location.href='tasks.html'"></i>
-      <i class="fas fa-gift" title="Gifts"></i>
+      <a href="leaderboard.html"><i class="fas fa-trophy"></i></a>
+      <a href="tasks.html"><i class="fas fa-tasks"></i></a>
+      <a href="gifts.html"><i class="fas fa-gift"></i></a>
     </div>
   </div>
 
-  <!-- ✅ Gift Cards -->
-  <h2 style="text-align:center; margin-top: 30px;">🎁 Available Gifts</h2>
-  <div id="giftContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px;"></div>
+  <!-- Main Content -->
+  <h2>Available Gifts</h2>
+  <div id="giftContainer"></div>
 
+  <!-- FIREBASE + SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      getFirestore, collection, getDocs, doc, updateDoc, query, where, getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    let student = null;
-    let students = [];
-    let gifts = [];
+    let currentUser = null;
+    let currentUserDocId = null;
 
-    const imageBase = "https://raw.githubusercontent.com/Swarup2024web/assets/main/";
+    const levelChart = [
+      { level: 1, points: 100 },
+      { level: 2, points: 500 },
+      { level: 3, points: 800 },
+      { level: 4, points: 1200 },
+      { level: 5, points: 1600 },
+    ];
+
+    function calculateLevel(totalPoints) {
+      let level = 0;
+      for (let entry of levelChart) {
+        if (totalPoints >= entry.points) level = entry.level;
+        else break;
+      }
+      return level;
+    }
+
+    async function loginUser() {
+      const name = document.getElementById("loginInput").value.trim();
+      if (!name) return alert("Enter name");
+
+      const q = query(collection(db, "students"), where("name", "==", name));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) return alert("No student found.");
+
+      snapshot.forEach(docSnap => {
+        currentUser = docSnap.data();
+        currentUserDocId = docSnap.id;
+      });
+
+      // Update UI
+      document.getElementById("loginInput").placeholder = currentUser.name;
+      document.getElementById("loginInput").value = "";
+      document.getElementById("pointDisplay").textContent = currentUser.totalPoints;
+      document.getElementById("levelDisplay").textContent = calculateLevel(currentUser.totalPoints);
+
+      loadGifts();
+    }
 
     async function loadGifts() {
-      const snap = await getDocs(collection(db, "gifts"));
-      gifts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      showGifts();
-    }
-
-    async function loadStudents() {
-      const snap = await getDocs(collection(db, "students"));
-      students = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
-
-    function getLevel(totalPoints) {
-      if (totalPoints >= 800) return 3;
-      if (totalPoints >= 500) return 2;
-      if (totalPoints >= 100) return 1;
-      return 0;
-    }
-
-    function handleLogin(e) {
-      if (e.key === "Enter") {
-        const name = e.target.value.trim().toLowerCase();
-        student = students.find(s => s.name.toLowerCase() === name);
-        const statusBox = document.getElementById("statusDisplay");
-
-        if (student) {
-          e.target.placeholder = student.name;
-          e.target.value = "";
-          const level = getLevel(student.totalPoints);
-          const pointsLeft = student.totalPoints - (student.pointsSpent || 0);
-          statusBox.textContent = `${pointsLeft} pts | Level ${level}`;
-          showGifts();
-        } else {
-          statusBox.textContent = "❌ Not Found";
-        }
-      }
-    }
-
-    function showGifts() {
       const container = document.getElementById("giftContainer");
       container.innerHTML = "";
+      const snapshot = await getDocs(collection(db, "gifts"));
+      snapshot.forEach(docSnap => {
+        const gift = docSnap.data();
+        const giftEl = document.createElement("div");
+        giftEl.className = "gift-card";
+        giftEl.innerHTML = `
+          <img src="${gift.image}" alt="${gift.name}" />
+          <h4>${gift.name}</h4>
+          <p>Cost: ${gift.cost} pts</p>
+        `;
 
-      gifts.forEach(gift => {
-        const card = document.createElement("div");
-        card.style.border = "1px solid #ccc";
-        card.style.borderRadius = "10px";
-        card.style.width = "180px";
-        card.style.padding = "10px";
-        card.style.textAlign = "center";
-        card.style.background = "#fff";
-        card.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
-
-        const img = document.createElement("img");
-        img.src = imageBase + gift.image;
-        img.style.width = "100%";
-        img.style.borderRadius = "8px";
-
-        const name = document.createElement("h4");
-        name.textContent = gift.name;
-
-        const cost = document.createElement("p");
-        cost.textContent = `Cost: ${gift.cost} pts`;
-
-        card.appendChild(img);
-        card.appendChild(name);
-        card.appendChild(cost);
-
-        if (student) {
-          const pointsLeft = student.totalPoints - (student.pointsSpent || 0);
-          if (pointsLeft >= gift.cost) {
-            const btn = document.createElement("button");
-            btn.textContent = "Redeem";
-            btn.style.padding = "8px 14px";
-            btn.style.border = "none";
-            btn.style.borderRadius = "6px";
-            btn.style.background = "#0077cc";
-            btn.style.color = "white";
-            btn.style.cursor = "pointer";
-
-            btn.onclick = async () => {
-              const confirmMsg = confirm(`Redeem "${gift.name}" for ${gift.cost} pts?`);
-              if (!confirmMsg) return;
-
-              const ref = doc(db, "students", student.id);
-              const newSpent = (student.pointsSpent || 0) + gift.cost;
-              await updateDoc(ref, {
-                pointsSpent: newSpent
-              });
-
-              alert("🎉 Redeemed! Please collect your gift from the teacher.");
-              student.pointsSpent = newSpent;
-              const level = getLevel(student.totalPoints);
-              document.getElementById("statusDisplay").textContent = `${student.totalPoints - newSpent} pts | Level ${level}`;
-              showGifts();
-            };
-
-            card.appendChild(btn);
-          } else {
-            const msg = document.createElement("p");
-            msg.textContent = "Not enough points";
-            msg.style.color = "#999";
-            card.appendChild(msg);
-          }
+        if (currentUser && currentUser.totalPoints >= gift.cost) {
+          const btn = document.createElement("button");
+          btn.textContent = "Redeem";
+          btn.onclick = () => redeemGift(docSnap.id, gift.cost, gift.name);
+          giftEl.appendChild(btn);
         }
 
-        container.appendChild(card);
+        container.appendChild(giftEl);
       });
     }
 
-    await loadStudents();
-    await loadGifts();
+    async function redeemGift(giftId, cost, name) {
+      if (!currentUser || !currentUserDocId) return;
+      const newPoints = currentUser.totalPoints - cost;
+
+      await updateDoc(doc(db, "students", currentUserDocId), {
+        totalPoints: newPoints,
+        pointsSpent: (currentUser.pointsSpent || 0) + cost
+      });
+
+      alert(`You redeemed "${name}". Please collect from your teacher.`);
+      currentUser.totalPoints = newPoints;
+      document.getElementById("pointDisplay").textContent = newPoints;
+      document.getElementById("levelDisplay").textContent = calculateLevel(newPoints);
+      loadGifts();
+    }
+
+    // If already logged in from storage (optional future feature)
+    // loginUser("Dip");
   </script>
 </body>
 </html>
