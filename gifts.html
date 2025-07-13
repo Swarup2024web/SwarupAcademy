@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gifts</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- ✅ HEADER -->
+  <div class="header">
+    <!-- Row 1: Login -->
+    <div class="header-row">
+      <input id="nameInput" placeholder="Enter your name & press Enter" onkeypress="handleLogin(event)" />
+    </div>
+
+    <!-- Row 2: Points and Level -->
+    <div class="header-row">
+      <div class="level-box" id="statusDisplay">Not logged in</div>
+    </div>
+
+    <!-- Row 3: Tabs -->
+    <div class="nav-tabs">
+      <i class="fas fa-trophy" title="Leaderboard" onclick="window.location.href='leaderboard.html'"></i>
+      <i class="fas fa-tasks" title="Tasks" onclick="window.location.href='tasks.html'"></i>
+      <i class="fas fa-gift" title="Gifts"></i>
+    </div>
+  </div>
+
+  <!-- ✅ Gift Cards -->
+  <h2 style="text-align:center; margin-top: 30px;">🎁 Available Gifts</h2>
+  <div id="giftContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px;"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { firebaseConfig } from "./firebaseConfig.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let student = null;
+    let students = [];
+    let gifts = [];
+
+    const imageBase = "https://raw.githubusercontent.com/Swarup2024web/assets/main/";
+
+    async function loadGifts() {
+      const snap = await getDocs(collection(db, "gifts"));
+      gifts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      showGifts();
+    }
+
+    async function loadStudents() {
+      const snap = await getDocs(collection(db, "students"));
+      students = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+
+    function getLevel(totalPoints) {
+      if (totalPoints >= 800) return 3;
+      if (totalPoints >= 500) return 2;
+      if (totalPoints >= 100) return 1;
+      return 0;
+    }
+
+    function handleLogin(e) {
+      if (e.key === "Enter") {
+        const name = e.target.value.trim().toLowerCase();
+        student = students.find(s => s.name.toLowerCase() === name);
+        const statusBox = document.getElementById("statusDisplay");
+
+        if (student) {
+          e.target.placeholder = student.name;
+          e.target.value = "";
+          const level = getLevel(student.totalPoints);
+          const pointsLeft = student.totalPoints - (student.pointsSpent || 0);
+          statusBox.textContent = `${pointsLeft} pts | Level ${level}`;
+          showGifts();
+        } else {
+          statusBox.textContent = "❌ Not Found";
+        }
+      }
+    }
+
+    function showGifts() {
+      const container = document.getElementById("giftContainer");
+      container.innerHTML = "";
+
+      gifts.forEach(gift => {
+        const card = document.createElement("div");
+        card.style.border = "1px solid #ccc";
+        card.style.borderRadius = "10px";
+        card.style.width = "180px";
+        card.style.padding = "10px";
+        card.style.textAlign = "center";
+        card.style.background = "#fff";
+        card.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
+
+        const img = document.createElement("img");
+        img.src = imageBase + gift.image;
+        img.style.width = "100%";
+        img.style.borderRadius = "8px";
+
+        const name = document.createElement("h4");
+        name.textContent = gift.name;
+
+        const cost = document.createElement("p");
+        cost.textContent = `Cost: ${gift.cost} pts`;
+
+        card.appendChild(img);
+        card.appendChild(name);
+        card.appendChild(cost);
+
+        if (student) {
+          const pointsLeft = student.totalPoints - (student.pointsSpent || 0);
+          if (pointsLeft >= gift.cost) {
+            const btn = document.createElement("button");
+            btn.textContent = "Redeem";
+            btn.style.padding = "8px 14px";
+            btn.style.border = "none";
+            btn.style.borderRadius = "6px";
+            btn.style.background = "#0077cc";
+            btn.style.color = "white";
+            btn.style.cursor = "pointer";
+
+            btn.onclick = async () => {
+              const confirmMsg = confirm(`Redeem "${gift.name}" for ${gift.cost} pts?`);
+              if (!confirmMsg) return;
+
+              const ref = doc(db, "students", student.id);
+              const newSpent = (student.pointsSpent || 0) + gift.cost;
+              await updateDoc(ref, {
+                pointsSpent: newSpent
+              });
+
+              alert("🎉 Redeemed! Please collect your gift from the teacher.");
+              student.pointsSpent = newSpent;
+              const level = getLevel(student.totalPoints);
+              document.getElementById("statusDisplay").textContent = `${student.totalPoints - newSpent} pts | Level ${level}`;
+              showGifts();
+            };
+
+            card.appendChild(btn);
+          } else {
+            const msg = document.createElement("p");
+            msg.textContent = "Not enough points";
+            msg.style.color = "#999";
+            card.appendChild(msg);
+          }
+        }
+
+        container.appendChild(card);
+      });
+    }
+
+    await loadStudents();
+    await loadGifts();
+  </script>
+</body>
+</html>
