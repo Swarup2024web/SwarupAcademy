@@ -7,14 +7,13 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      margin: 0;
+      background: #fef2f7;
       padding: 20px;
-      background: #fdf6ff;
       color: #333;
     }
     h1, h2 {
       text-align: center;
-      color: #c2185b;
+      color: #d81b60;
     }
     section {
       background: #fff0f5;
@@ -31,8 +30,8 @@
     }
     th, td {
       padding: 10px;
-      text-align: left;
       border-bottom: 1px solid #ffd6e6;
+      text-align: left;
     }
     input[type="text"], input[type="number"] {
       padding: 8px;
@@ -41,7 +40,7 @@
       width: 90%;
     }
     button {
-      padding: 8px 14px;
+      padding: 8px 16px;
       background: #e91e63;
       color: white;
       border: none;
@@ -53,7 +52,7 @@
     }
     .form-grid {
       display: flex;
-      gap: 15px;
+      gap: 10px;
       flex-wrap: wrap;
       margin-top: 10px;
     }
@@ -64,24 +63,27 @@
 </head>
 <body>
 
-  <h1>🌟 Admin Panel</h1>
+  <h1>Admin Panel</h1>
 
-  <!-- STUDENT POINTS SECTION -->
+  <!-- 🔁 Bulk Update Points -->
   <section>
-    <h2>Update Student Points</h2>
-    <table id="studentTable">
+    <h2>Bulk Add Points</h2>
+    <input type="number" id="bulkPoints" placeholder="Points to add to selected" />
+    <button onclick="bulkUpdate()">Update Points</button>
+
+    <table>
       <thead>
         <tr>
+          <th>Select</th>
           <th>Name</th>
-          <th>Points to Add</th>
-          <th>Update</th>
+          <th>Total Points</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="studentTableBody"></tbody>
     </table>
   </section>
 
-  <!-- ADD TASK SECTION -->
+  <!-- ✅ Add Task -->
   <section>
     <h2>Add Task</h2>
     <div class="form-grid">
@@ -92,18 +94,18 @@
     </div>
   </section>
 
-  <!-- ADD GIFT SECTION -->
+  <!-- 🎁 Add Gift -->
   <section>
     <h2>Add Gift</h2>
     <div class="form-grid">
       <input type="text" id="giftName" placeholder="Gift name" />
-      <input type="number" id="giftCost" placeholder="Cost (points)" />
+      <input type="number" id="giftCost" placeholder="Cost" />
       <input type="text" id="giftImage" placeholder="Image (e.g., pen.png)" />
       <button onclick="addGift()">Add Gift</button>
     </div>
   </section>
 
-  <!-- FIREBASE & SCRIPT -->
+  <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -114,36 +116,52 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const studentsRef = collection(db, "students");
-    const tasksRef = collection(db, "tasks");
-    const giftsRef = collection(db, "gifts");
+    let students = [];
 
     async function loadStudents() {
-      const snapshot = await getDocs(studentsRef);
-      const table = document.querySelector("#studentTable tbody");
-      table.innerHTML = "";
+      const snapshot = await getDocs(collection(db, "students"));
+      students = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
 
-      snapshot.forEach(docSnap => {
-        const student = { id: docSnap.id, ...docSnap.data() };
-        const row = document.createElement("tr");
-        row.innerHTML = `
+      const tbody = document.getElementById("studentTableBody");
+      tbody.innerHTML = "";
+
+      students.forEach(student => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><input type="checkbox" class="studentCheckbox" data-id="${student.id}" /></td>
           <td>${student.name}</td>
-          <td><input type="number" id="pts-${student.id}" placeholder="0" /></td>
-          <td><button onclick="updatePoints('${student.id}', ${student.totalPoints})">Save</button></td>
+          <td>${student.totalPoints}</td>
         `;
-        table.appendChild(row);
+        tbody.appendChild(tr);
       });
     }
 
-    async function updatePoints(id, currentPoints) {
-      const input = document.getElementById("pts-" + id);
-      const add = parseInt(input.value);
-      if (isNaN(add)) return;
-      const newTotal = currentPoints + add;
-      await updateDoc(doc(db, "students", id), {
-        totalPoints: newTotal
-      });
-      alert("✅ Points updated!");
+    async function bulkUpdate() {
+      const points = parseInt(document.getElementById("bulkPoints").value);
+      if (isNaN(points)) return alert("Please enter a valid number of points.");
+
+      const checkboxes = document.querySelectorAll(".studentCheckbox:checked");
+
+      if (checkboxes.length === 0) {
+        alert("Please select at least one student.");
+        return;
+      }
+
+      for (const checkbox of checkboxes) {
+        const id = checkbox.dataset.id;
+        const student = students.find(s => s.id === id);
+        const newTotal = student.totalPoints + points;
+
+        await updateDoc(doc(db, "students", id), {
+          totalPoints: newTotal
+        });
+      }
+
+      alert("✅ Points updated for selected students.");
+      document.getElementById("bulkPoints").value = "";
       loadStudents();
     }
 
@@ -151,9 +169,16 @@
       const name = document.getElementById("taskName").value.trim();
       const points = parseInt(document.getElementById("taskPoints").value);
       const image = document.getElementById("taskImage").value.trim();
-      if (!name || isNaN(points) || !image) return alert("Please fill all fields.");
 
-      await addDoc(tasksRef, { name, points, image });
+      if (!name || isNaN(points) || !image) {
+        alert("Fill all task fields.");
+        return;
+      }
+
+      await addDoc(collection(db, "tasks"), {
+        name, points, image
+      });
+
       alert("✅ Task added!");
       document.getElementById("taskName").value = "";
       document.getElementById("taskPoints").value = "";
@@ -164,9 +189,16 @@
       const name = document.getElementById("giftName").value.trim();
       const cost = parseInt(document.getElementById("giftCost").value);
       const image = document.getElementById("giftImage").value.trim();
-      if (!name || isNaN(cost) || !image) return alert("Please fill all fields.");
 
-      await addDoc(giftsRef, { name, cost, image });
+      if (!name || isNaN(cost) || !image) {
+        alert("Fill all gift fields.");
+        return;
+      }
+
+      await addDoc(collection(db, "gifts"), {
+        name, cost, image
+      });
+
       alert("🎁 Gift added!");
       document.getElementById("giftName").value = "";
       document.getElementById("giftCost").value = "";
