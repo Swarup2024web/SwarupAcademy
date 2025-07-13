@@ -1,209 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
   <style>
     body {
+      font-family: "Segoe UI", sans-serif;
+      background: #fff6fb;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0faff;
-      color: #003366;
+      padding: 20px;
+      color: #333;
     }
 
     h2 {
       text-align: center;
-      margin: 24px 0 10px;
-      color: #004488;
+      color: #cc3377;
+      margin-bottom: 30px;
     }
 
     .section {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .box {
-      background: white;
-      border: 2px solid #cce7ff;
+      background: #ffeef5;
+      border: 2px solid #ffb3cc;
       border-radius: 12px;
       padding: 20px;
-      margin-bottom: 40px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+      box-shadow: 0 4px 8px rgba(255, 182, 193, 0.3);
     }
 
-    .box label {
+    label {
+      display: block;
+      margin-top: 10px;
       font-weight: bold;
+      color: #cc0052;
     }
 
-    .box input[type="text"],
-    .box input[type="number"] {
+    input, select {
       width: 100%;
       padding: 10px;
-      font-size: 16px;
-      margin: 10px 0;
-      border: 2px solid #0077cc;
+      margin-top: 5px;
+      border: 2px solid #ff99bb;
       border-radius: 8px;
-    }
-
-    .box button {
-      padding: 10px 20px;
       font-size: 16px;
-      background: #0077cc;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
     }
 
-    .box button:hover {
-      background: #005fa3;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    button {
       margin-top: 15px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: center;
-      font-size: 15px;
-    }
-
-    th {
-      background: #0077cc;
+      padding: 10px 20px;
+      background: #ff66a3;
+      border: none;
+      border-radius: 10px;
       color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
     }
 
-    .update-input {
-      width: 80px;
-      padding: 6px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: 1px solid #0077cc;
+    button:hover {
+      background: #e60073;
+    }
+
+    .student-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1px solid #ffccdd;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .student-item input[type="checkbox"] {
+      margin-right: 10px;
     }
 
     @media (max-width: 600px) {
-      .box input, .box button, .update-input {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-
-      table {
-        font-size: 13px;
-      }
-
-      th, td {
-        padding: 8px;
+      input, button {
+        font-size: 15px;
       }
     }
   </style>
 </head>
-
 <body>
-  <h2>Admin Panel</h2>
+
+  <h2>🌸 Admin Panel</h2>
+
+  <!-- Add Student -->
   <div class="section">
+    <h3>👩‍🎓 Add Student</h3>
+    <label>Name</label>
+    <input type="text" id="studentName" placeholder="Enter name" />
 
-    <!-- Add Student -->
-    <div class="box">
-      <h3>➕ Add New Student</h3>
-      <label>Student Name</label>
-      <input type="text" id="studentName" placeholder="Name" />
-      <label>Image (e.g. dip.png)</label>
-      <input type="text" id="studentImage" placeholder="Image filename" />
-      <label>Initial Total Points</label>
-      <input type="number" id="studentPoints" placeholder="0" />
-      <button onclick="addStudent()">Add Student</button>
-    </div>
+    <label>Image Filename (e.g. dip.png)</label>
+    <input type="text" id="studentImage" placeholder="Only the filename" />
 
-    <!-- Update Points -->
-    <div class="box">
-      <h3>🧮 Update Points</h3>
-      <table id="studentsTable">
-        <thead>
-          <tr><th>Name</th><th>Total Points</th><th>Add Points</th></tr>
-        </thead>
-        <tbody id="studentsBody"></tbody>
-      </table>
-      <br />
-      <button onclick="updatePoints()">Save Updates</button>
-    </div>
+    <label>Total Points</label>
+    <input type="number" id="studentPoints" placeholder="Start points" />
 
-    <!-- Task Management -->
-    <div class="box">
-      <h3>📋 Add New Task</h3>
-      <label>Task Name</label>
-      <input type="text" id="taskName" placeholder="Task name" />
-      <label>Points</label>
-      <input type="number" id="taskPoints" placeholder="e.g. 50" />
-      <button onclick="addTask()">Add Task</button>
-    </div>
-
-    <!-- Gift Management -->
-    <div class="box">
-      <h3>🎁 Add New Gift</h3>
-      <label>Gift Name</label>
-      <input type="text" id="giftName" placeholder="Gift name" />
-      <label>Image Filename (e.g. pen.png)</label>
-      <input type="text" id="giftImage" placeholder="pen.png" />
-      <label>Cost in Points</label>
-      <input type="number" id="giftCost" placeholder="e.g. 200" />
-      <button onclick="addGift()">Add Gift</button>
-    </div>
+    <button onclick="addStudent()">Add Student</button>
   </div>
 
-  <!-- FIREBASE + SCRIPT -->
+  <!-- Add Task -->
+  <div class="section">
+    <h3>📋 Add Task</h3>
+    <label>Task Name</label>
+    <input type="text" id="taskName" placeholder="Enter task" />
+
+    <label>Points</label>
+    <input type="number" id="taskPoints" placeholder="e.g. 100" />
+
+    <button onclick="addTask()">Add Task</button>
+  </div>
+
+  <!-- Add Gift -->
+  <div class="section">
+    <h3>🎁 Add Gift</h3>
+    <label>Gift Name</label>
+    <input type="text" id="giftName" placeholder="Enter gift name" />
+
+    <label>Cost (Points)</label>
+    <input type="number" id="giftCost" placeholder="e.g. 200" />
+
+    <label>Image Filename (e.g. pen.png)</label>
+    <input type="text" id="giftImage" placeholder="Only the filename" />
+
+    <button onclick="addGift()">Add Gift</button>
+  </div>
+
+  <!-- Update Points -->
+  <div class="section">
+    <h3>✨ Update Points</h3>
+    <div id="studentsList">Loading students...</div>
+
+    <label>Points to Add/Subtract</label>
+    <input type="number" id="pointsToAdd" placeholder="e.g. 100 or -50" />
+
+    <button onclick="updatePoints()">Save Points</button>
+  </div>
+
+  <!-- Firebase + Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, updateDoc, doc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const studentCol = collection(db, "students");
-    const taskCol = collection(db, "tasks");
-    const giftCol = collection(db, "gifts");
-
-    async function loadStudents() {
-      const snapshot = await getDocs(studentCol);
-      const tbody = document.getElementById("studentsBody");
-      tbody.innerHTML = "";
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${data.name}</td>
-          <td>${data.totalPoints || 0}</td>
-          <td><input type="number" class="update-input" data-id="${docSnap.id}" placeholder="+pts" /></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    window.addStudent = async function () {
+    async function addStudent() {
       const name = document.getElementById("studentName").value.trim();
       const image = document.getElementById("studentImage").value.trim();
-      const points = parseInt(document.getElementById("studentPoints").value) || 0;
+      const totalPoints = parseInt(document.getElementById("studentPoints").value);
 
-      if (!name || !image) return alert("Enter name and image.");
+      if (!name || !image || isNaN(totalPoints)) {
+        alert("Please fill all student fields.");
+        return;
+      }
 
-      await addDoc(studentCol, {
-        name,
-        image: `https://raw.githubusercontent.com/Swarup2024web/newswarup/main/storage/assets/${image}`,
-        totalPoints: points,
+      await addDoc(collection(db, "students"), {
+        name: name,
+        image: image,
+        totalPoints: totalPoints,
         pointsSpent: 0
       });
 
@@ -212,48 +172,95 @@
       document.getElementById("studentImage").value = "";
       document.getElementById("studentPoints").value = "";
       loadStudents();
-    };
+    }
 
-    window.updatePoints = async function () {
-      const inputs = document.querySelectorAll(".update-input");
-      for (let input of inputs) {
-        const value = parseInt(input.value);
-        const id = input.getAttribute("data-id");
-        if (!isNaN(value) && value !== 0) {
-          const ref = doc(db, "students", id);
-          const current = (await getDocs(studentCol)).docs.find(d => d.id === id).data().totalPoints || 0;
-          await updateDoc(ref, { totalPoints: current + value });
-        }
-      }
-      alert("Points updated!");
-      loadStudents();
-    };
-
-    window.addTask = async function () {
+    async function addTask() {
       const name = document.getElementById("taskName").value.trim();
-      const points = parseInt(document.getElementById("taskPoints").value) || 0;
-      if (!name) return alert("Enter task name.");
-      await addDoc(taskCol, { name, points });
+      const points = parseInt(document.getElementById("taskPoints").value);
+
+      if (!name || isNaN(points)) {
+        alert("Please fill all task fields.");
+        return;
+      }
+
+      await addDoc(collection(db, "tasks"), {
+        name: name,
+        points: points
+      });
+
       alert("Task added!");
       document.getElementById("taskName").value = "";
       document.getElementById("taskPoints").value = "";
-    };
+    }
 
-    window.addGift = async function () {
+    async function addGift() {
       const name = document.getElementById("giftName").value.trim();
+      const cost = parseInt(document.getElementById("giftCost").value);
       const image = document.getElementById("giftImage").value.trim();
-      const cost = parseInt(document.getElementById("giftCost").value) || 0;
-      if (!name || !image) return alert("Enter gift name and image.");
-      await addDoc(giftCol, {
-        name,
-        image: `https://raw.githubusercontent.com/Swarup2024web/newswarup/main/storage/assets/${image}`,
-        cost
+
+      if (!name || isNaN(cost) || !image) {
+        alert("Please fill all gift fields.");
+        return;
+      }
+
+      await addDoc(collection(db, "gifts"), {
+        name: name,
+        cost: cost,
+        image: image
       });
+
       alert("Gift added!");
       document.getElementById("giftName").value = "";
-      document.getElementById("giftImage").value = "";
       document.getElementById("giftCost").value = "";
-    };
+      document.getElementById("giftImage").value = "";
+    }
+
+    let allStudents = [];
+
+    async function loadStudents() {
+      const snapshot = await getDocs(collection(db, "students"));
+      const container = document.getElementById("studentsList");
+      container.innerHTML = "";
+      allStudents = [];
+
+      snapshot.forEach(docSnap => {
+        const student = docSnap.data();
+        allStudents.push({ id: docSnap.id, ...student });
+
+        const div = document.createElement("div");
+        div.className = "student-item";
+        div.innerHTML = `
+          <label>
+            <input type="checkbox" value="${docSnap.id}" />
+            ${student.name} (${student.totalPoints} pts)
+          </label>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    async function updatePoints() {
+      const checkboxes = document.querySelectorAll("#studentsList input[type='checkbox']:checked");
+      const pointDelta = parseInt(document.getElementById("pointsToAdd").value);
+      if (checkboxes.length === 0 || isNaN(pointDelta)) {
+        alert("Select students and enter valid points.");
+        return;
+      }
+
+      for (let checkbox of checkboxes) {
+        const studentId = checkbox.value;
+        const student = allStudents.find(s => s.id === studentId);
+        const newPoints = student.totalPoints + pointDelta;
+
+        await updateDoc(doc(db, "students", studentId), {
+          totalPoints: newPoints
+        });
+      }
+
+      alert("Points updated!");
+      document.getElementById("pointsToAdd").value = "";
+      loadStudents();
+    }
 
     loadStudents();
   </script>
