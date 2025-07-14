@@ -30,13 +30,13 @@
     </div>
   </div>
 
-  <!-- 🎁 Gift List -->
+  <!-- 🎁 Gifts Section -->
   <div class="container">
     <h2 class="page-title">Available Gifts</h2>
-    <div id="giftsGrid" class="gift-grid"></div>
+    <div id="giftGrid" class="gift-grid"></div>
   </div>
 
-  <!-- 🔌 Firebase & Logic -->
+  <!-- 🔌 Firebase Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -49,10 +49,10 @@
 
     const studentSelect = document.getElementById("studentSelect");
     const studentStatus = document.getElementById("studentStatus");
-    const giftsGrid = document.getElementById("giftsGrid");
+    const giftGrid = document.getElementById("giftGrid");
 
-    let currentStudent = null;
     let currentStudentId = null;
+    let currentStudentData = null;
 
     function calculateLevel(points) {
       if (points >= 800) return 3;
@@ -90,58 +90,50 @@
       const snap = await getDoc(ref);
       if (!snap.exists()) return;
 
-      currentStudent = snap.data();
+      currentStudentData = snap.data();
       currentStudentId = id;
 
-      const level = calculateLevel(currentStudent.totalPoints);
-      studentStatus.innerHTML = `🎓 <strong>${currentStudent.name}</strong><br>Points: <strong>${currentStudent.totalPoints}</strong> | Level: <strong>${level}</strong>`;
+      const level = calculateLevel(currentStudentData.totalPoints);
+      studentStatus.innerHTML = `🎓 <strong>${currentStudentData.name}</strong><br>Points: <strong>${currentStudentData.totalPoints - currentStudentData.pointsSpent}</strong> | Level: <strong>${level}</strong>`;
+
+      loadGifts();
     }
 
     async function loadGifts() {
       const snap = await getDocs(collection(db, "gifts"));
-      giftsGrid.innerHTML = "";
+      giftGrid.innerHTML = "";
 
       snap.forEach(docSnap => {
         const gift = docSnap.data();
         const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${gift.image}`;
+        const pointsLeft = currentStudentData.totalPoints - currentStudentData.pointsSpent;
+        const canRedeem = pointsLeft >= gift.cost;
 
-        const div = document.createElement("div");
-        div.className = "gift-card";
-        div.innerHTML = `
-          <img class="gift-img" src="${imageUrl}" alt="${gift.name}" />
-          <div class="gift-points rainbow">${gift.cost} pts</div>
+        const card = document.createElement("div");
+        card.className = "gift-card";
+        card.innerHTML = `
+          <img src="${imageUrl}" class="gift-img" alt="${gift.name}" />
           <h3>${gift.name}</h3>
-          <button class="redeem-btn">Redeem</button>
+          <div class="gift-points">💠 ${gift.cost} pts</div>
+          <button class="redeem-btn" ${!canRedeem ? 'disabled' : ''}>Redeem</button>
         `;
 
-        const btn = div.querySelector(".redeem-btn");
+        const btn = card.querySelector("button");
         btn.addEventListener("click", async () => {
-          if (!currentStudent) {
-            alert("Please select a student first.");
-            return;
-          }
-
-          if (currentStudent.totalPoints < gift.cost) {
-            alert("Not enough points.");
-            return;
-          }
-
-          const newPoints = currentStudent.totalPoints - gift.cost;
-          await updateDoc(doc(db, "students", currentStudentId), {
-            totalPoints: newPoints,
-            pointsSpent: (currentStudent.pointsSpent || 0) + gift.cost
+          if (!canRedeem) return;
+          const ref = doc(db, "students", currentStudentId);
+          await updateDoc(ref, {
+            pointsSpent: currentStudentData.pointsSpent + gift.cost
           });
-
-          alert("🎁 Gift redeemed! Please collect it from your teacher.");
-          await loadStudentInfo(currentStudentId);
+          alert(`🎉 Redeemed "${gift.name}". Please collect it from your teacher.`);
+          await loadStudentInfo(currentStudentId); // refresh points
         });
 
-        giftsGrid.appendChild(div);
+        giftGrid.appendChild(card);
       });
     }
 
     await loadStudents();
-    await loadGifts();
   </script>
 
 </body>
