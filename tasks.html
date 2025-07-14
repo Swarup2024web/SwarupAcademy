@@ -30,13 +30,13 @@
     </div>
   </div>
 
-  <!-- 📋 Task List -->
+  <!-- 📋 Task Grid -->
   <div class="container">
     <h2 class="page-title">Assigned Tasks</h2>
-    <div id="tasksList" class="task-grid"></div>
+    <div id="tasksGrid" class="task-grid"></div>
   </div>
 
-  <!-- 🔌 Firebase & Logic -->
+  <!-- 🔌 Firebase Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -49,7 +49,7 @@
 
     const studentSelect = document.getElementById("studentSelect");
     const studentStatus = document.getElementById("studentStatus");
-    const tasksList = document.getElementById("tasksList");
+    const tasksGrid = document.getElementById("tasksGrid");
 
     let currentStudentId = null;
 
@@ -98,7 +98,7 @@
 
     async function loadTasks() {
       const snap = await getDocs(collection(db, "tasks"));
-      tasksList.innerHTML = "";
+      tasksGrid.innerHTML = "";
 
       snap.forEach(docSnap => {
         const task = docSnap.data();
@@ -107,15 +107,11 @@
         const card = document.createElement("div");
         card.className = "task-card";
         card.innerHTML = `
-          <div class="task-img">
-            <img src="${imageUrl}" alt="${task.name}" />
-          </div>
-          <div class="task-info">
-            <h3>${task.name}</h3>
-            <div class="task-points rainbow">${task.points} pts</div>
-          </div>
+          <img src="${imageUrl}" class="task-img" alt="${task.name}" />
+          <h3>${task.name}</h3>
+          <div class="task-points">+${task.points} pts</div>
         `;
-        tasksList.appendChild(card);
+        tasksGrid.appendChild(card);
       });
     }
 
