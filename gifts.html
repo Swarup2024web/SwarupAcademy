@@ -10,7 +10,7 @@
 
   <!-- 🔼 HEADER -->
   <div class="header">
-    <!-- Row 1: Dropdown for student login -->
+    <!-- Row 1: Dropdown Login -->
     <div class="login">
       <select id="studentSelect">
         <option value="">👤 Select Student</option>
@@ -22,7 +22,7 @@
       Select a student to view points and level.
     </div>
 
-    <!-- Row 3: Navigation Tabs -->
+    <!-- Row 3: Navigation -->
     <div class="nav">
       <a href="leaderboard.html" title="Leaderboard">🏆</a>
       <a href="tasks.html" title="Tasks">📋</a>
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <!-- 🎁 Gifts Section -->
+  <!-- 🎁 Gifts Grid -->
   <div class="container">
     <h2 class="page-title">Available Gifts</h2>
     <div id="giftGrid" class="gift-grid"></div>
@@ -94,7 +94,8 @@
       currentStudentId = id;
 
       const level = calculateLevel(currentStudentData.totalPoints);
-      studentStatus.innerHTML = `🎓 <strong>${currentStudentData.name}</strong><br>Points: <strong>${currentStudentData.totalPoints - currentStudentData.pointsSpent}</strong> | Level: <strong>${level}</strong>`;
+      const availablePoints = currentStudentData.totalPoints - currentStudentData.pointsSpent;
+      studentStatus.innerHTML = `🎓 <strong>${currentStudentData.name}</strong><br>Points: <strong>${availablePoints}</strong> | Level: <strong>${level}</strong>`;
 
       loadGifts();
     }
@@ -125,8 +126,8 @@
           await updateDoc(ref, {
             pointsSpent: currentStudentData.pointsSpent + gift.cost
           });
-          alert(`🎉 Redeemed "${gift.name}". Please collect it from your teacher.`);
-          await loadStudentInfo(currentStudentId); // refresh points
+          alert(`🎉 "${gift.name}" redeemed! Collect it from your teacher.`);
+          await loadStudentInfo(currentStudentId);
         });
 
         giftGrid.appendChild(card);
