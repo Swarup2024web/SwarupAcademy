@@ -95,7 +95,7 @@
 
       const level = calculateLevel(currentStudentData.totalPoints);
       const availablePoints = currentStudentData.totalPoints - currentStudentData.pointsSpent;
-      studentStatus.innerHTML = `🎓 <strong>${currentStudentData.name}</strong><br>Points: <strong>${availablePoints}</strong> | Level: <strong>${level}</strong>`;
+      studentStatus.innerHTML = `🎓 <strong>${currentStudentData.name}</strong><br>Points: <strong>${availablePoints}</strong> 💠 pts | Level: <strong>${level}</strong>`;
 
       loadGifts();
     }
