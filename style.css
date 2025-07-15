@@ -1,4 +1,4 @@
-/* GENERAL */
+/* GLOBAL STYLES */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
@@ -20,13 +20,14 @@ h2.page-title {
 /* HEADER */
 .header {
   background: linear-gradient(to right, #b3e5fc, #81d4fa);
-  padding: 0.5rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding-bottom: 0.5rem;
 }
 
+/* Row 1: Dropdown */
 .login {
   text-align: center;
-  margin-bottom: 8px;
+  padding: 10px;
 }
 
 .login select {
@@ -37,20 +38,20 @@ h2.page-title {
   background: #fff;
 }
 
+/* Row 2: Student Info */
 .student-info {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 15px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .student-left {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
 }
 
 .student-left img.student-photo {
@@ -72,23 +73,19 @@ h2.page-title {
   gap: 5px;
 }
 
-.student-stats.fire {
-  animation: glow 1.5s infinite alternate;
-}
-
-/* NAVIGATION */
+/* Row 3: Navigation */
 .nav {
   display: flex;
   justify-content: space-around;
   background: #b3e5fc;
-  padding: 10px 0;
+  padding: 12px 0;
   border-top: 1px solid #90caf9;
 }
 
 .nav a {
   color: #0d47a1;
   font-size: 22px;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 }
 
 .nav a:hover {
@@ -98,26 +95,16 @@ h2.page-title {
 
 /* FIRE ANIMATION */
 @keyframes flicker {
-  0%, 100% { opacity: 1; transform: scale(1) rotate(0); }
-  50% { opacity: 0.7; transform: scale(1.2) rotate(5deg); }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
 }
-
-@keyframes burnUp {
-  0% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(-2px); opacity: 0.8; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes fireGlow {
-  0% { text-shadow: 0 0 3px orange; }
+@keyframes glow {
+  0%, 100% { text-shadow: 0 0 3px orange; }
   50% { text-shadow: 0 0 10px red; }
-  100% { text-shadow: 0 0 3px orange; }
 }
 
-.gift-fire i,
-.task-card .gift-fire i,
-.leaderboard-fire i {
-  animation: flicker 1s infinite ease-in-out, fireGlow 1.4s infinite ease-in-out, burnUp 2s infinite ease-in-out;
+.fire-icon {
+  animation: flicker 1s infinite ease-in-out, glow 2s infinite ease-in-out;
   color: orangered;
   font-size: 18px;
   position: absolute;
@@ -139,17 +126,42 @@ h2.page-title {
   margin-right: 5px;
 }
 
-.rank-icon.gold {
-  color: gold;
-}
-.rank-icon.silver {
-  color: silver;
-}
-.rank-icon.bronze {
-  color: #cd7f32;
+.rank-icon.gold { color: gold; }
+.rank-icon.silver { color: silver; }
+.rank-icon.bronze { color: #cd7f32; }
+
+/* LEADERBOARD */
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* GIFTS */
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 15px;
+}
+
+.leaderboard-table th {
+  background-color: #bbdefb;
+  color: #0d47a1;
+}
+
+.leaderboard-table img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* GIFTS PAGE */
 .gift-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -204,7 +216,7 @@ h2.page-title {
   background: #388e3c;
 }
 
-/* TASKS */
+/* TASKS PAGE */
 .task-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -248,41 +260,11 @@ h2.page-title {
   border-radius: 12px;
   font-size: 14px;
   display: inline-block;
-}
-
-/* LEADERBOARD */
-.leaderboard-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.leaderboard-table th,
-.leaderboard-table td {
-  padding: 10px;
-  text-align: center;
-  border-bottom: 1px solid #e0e0e0;
-  font-size: 15px;
-}
-
-.leaderboard-table th {
-  background-color: #bbdefb;
-  color: #0d47a1;
-}
-
-.leaderboard-table img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
+  font-weight: bold;
 }
 
 /* RESPONSIVE */
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 600px) {
   .student-info {
     flex-direction: column;
   }
@@ -300,4 +282,19 @@ h2.page-title {
     width: 100%;
     height: auto;
   }
-}
+
+  .leaderboard-table th,
+  .leaderboard-table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .nav a {
+    font-size: 20px;
+  }
+
+  .gift-card img.gift-img {
+    width: 80px;
+    height: 80px;
+  }
+  }
