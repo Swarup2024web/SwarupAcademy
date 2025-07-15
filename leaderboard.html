@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Leaderboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+  <script src="https://kit.fontawesome.com/a2d5df8e9e.js" crossorigin="anonymous"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+  <script type="module" src="firebaseConfig.js"></script>
 </head>
 <body>
 
@@ -13,15 +15,21 @@
   <div class="header">
     <!-- Row 1: Login Dropdown -->
     <div class="login">
-      <select id="studentSelect">
-        <option value="">👤 Select Student</option>
+      <select id="studentDropdown" onchange="loginStudent(this.value)">
+        <option value="">🔓 Select Student</option>
       </select>
     </div>
 
     <!-- Row 2: Student Info -->
-    <div class="student-info">
-      <div class="student-left" id="studentLeft"></div>
-      <div class="student-right" id="studentRight"></div>
+    <div class="student-info" id="studentInfo" style="display: none;">
+      <div class="student-left">
+        <img src="" alt="Student" class="student-photo" id="studentPhoto">
+        <strong id="studentName">Name</strong>
+      </div>
+      <div class="student-stats">
+        <span id="studentPoints">0 pts</span> |
+        <span id="studentLevel">Level 1</span>
+      </div>
     </div>
 
     <!-- Row 3: Navigation -->
@@ -32,40 +40,42 @@
     </div>
   </div>
 
-  <!-- LEADERBOARD SECTION -->
+  <!-- MAIN -->
   <div class="container">
-    <h2 class="page-title"><i class="fas fa-trophy"></i> Top Students</h2>
-    <table>
+    <h2 class="page-title">🏆 Leaderboard</h2>
+    <table class="leaderboard-table" id="leaderboardTable">
       <thead>
         <tr>
           <th>Rank</th>
-          <th>Photo</th>
+          <th>Image</th>
           <th>Name</th>
           <th>Total Points</th>
+          <th>Level</th>
         </tr>
       </thead>
-      <tbody id="leaderboardBody"></tbody>
+      <tbody id="leaderboardBody">
+        <!-- JS injects here -->
+      </tbody>
     </table>
   </div>
 
-  <!-- SCRIPTS -->
+  <!-- SCRIPT -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getFirestore, collection, getDocs, doc, getDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const studentSelect = document.getElementById("studentSelect");
-    const leaderboardBody = document.getElementById("leaderboardBody");
-    const studentLeft = document.getElementById("studentLeft");
-    const studentRight = document.getElementById("studentRight");
+    const dropdown = document.getElementById("studentDropdown");
+    const studentInfo = document.getElementById("studentInfo");
+    const studentPhoto = document.getElementById("studentPhoto");
+    const studentName = document.getElementById("studentName");
+    const studentPoints = document.getElementById("studentPoints");
+    const studentLevel = document.getElementById("studentLevel");
 
-    let currentStudentId = null;
-    let currentStudentData = null;
+    let students = [];
 
     function calculateLevel(points) {
       if (points >= 800) return 3;
@@ -74,99 +84,65 @@
       return 0;
     }
 
-    async function loadStudentsDropdown() {
-      const snap = await getDocs(collection(db, "students"));
-      snap.forEach(docSnap => {
-        const data = docSnap.data();
-        const option = document.createElement("option");
-        option.value = docSnap.id;
-        option.textContent = data.name;
-        studentSelect.appendChild(option);
+    function renderLeaderboard() {
+      const tbody = document.getElementById("leaderboardBody");
+      tbody.innerHTML = "";
+
+      students.sort((a, b) => {
+        if (b.totalPoints === a.totalPoints) {
+          return a.name.localeCompare(b.name);
+        }
+        return b.totalPoints - a.totalPoints;
       });
 
-      const savedID = localStorage.getItem("studentID");
-      if (savedID) {
-        studentSelect.value = savedID;
-        await loadStudentInfo(savedID);
+      students.forEach((student, index) => {
+        const tr = document.createElement("tr");
+
+        // Crown for Top 3
+        let crown = "";
+        if (index === 0) crown = '<i class="fas fa-crown rank-icon gold"></i>';
+        else if (index === 1) crown = '<i class="fas fa-crown rank-icon silver"></i>';
+        else if (index === 2) crown = '<i class="fas fa-crown rank-icon bronze"></i>';
+
+        tr.innerHTML = `
+          <td>${crown || index + 1}</td>
+          <td><img src="https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${student.image}" /></td>
+          <td>${student.name}</td>
+          <td>${student.totalPoints}</td>
+          <td>Level ${calculateLevel(student.totalPoints)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loginStudent(name) {
+      const selected = students.find(s => s.name === name);
+      if (selected) {
+        studentInfo.style.display = "flex";
+        studentPhoto.src = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${selected.image}`;
+        studentName.textContent = selected.name;
+        studentPoints.textContent = `${selected.totalPoints - selected.pointsSpent} pts`;
+        studentLevel.textContent = `Level ${calculateLevel(selected.totalPoints)}`;
       }
     }
 
-    studentSelect.addEventListener("change", async () => {
-      const id = studentSelect.value;
-      if (!id) return;
-      localStorage.setItem("studentID", id);
-      await loadStudentInfo(id);
-    });
+    async function loadStudents() {
+      const snapshot = await getDocs(collection(db, "students"));
+      students = snapshot.docs.map(doc => doc.data());
 
-    async function loadStudentInfo(id) {
-      const ref = doc(db, "students", id);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) return;
+      // Fill dropdown
+      students.forEach(s => {
+        const option = document.createElement("option");
+        option.value = s.name;
+        option.textContent = s.name;
+        dropdown.appendChild(option);
+      });
 
-      currentStudentData = snap.data();
-      currentStudentId = id;
-
-      const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${currentStudentData.image}`;
-      const level = calculateLevel(currentStudentData.totalPoints);
-      const pointsLeft = currentStudentData.totalPoints - currentStudentData.pointsSpent;
-
-      studentLeft.innerHTML = `
-        <img src="${imageUrl}" class="student-photo" />
-        <span>${currentStudentData.name}</span>
-        <div class="student-stats"><i class="fas fa-coins"></i> ${pointsLeft}</div>
-        <div class="student-stats fire"><i class="fas fa-fire"></i> Level ${level}</div>
-      `;
-      studentRight.innerHTML = "";
+      renderLeaderboard();
     }
 
-    async function loadLeaderboard() {
-      const snap = await getDocs(collection(db, "students"));
-      let students = [];
-
-      snap.forEach(docSnap => {
-        const data = docSnap.data();
-        students.push({
-          name: data.name,
-          totalPoints: data.totalPoints,
-          image: data.image
-        });
-      });
-
-      // Sort by points DESC, name ASC
-      students.sort((a, b) => {
-        if (b.totalPoints !== a.totalPoints)
-          return b.totalPoints - a.totalPoints;
-        return a.name.localeCompare(b.name);
-      });
-
-      leaderboardBody.innerHTML = "";
-
-      students.forEach((student, index) => {
-        const row = document.createElement("tr");
-
-        let rankIcon = (index === 0)
-          ? '<i class="fas fa-crown" style="color: gold;"></i>'
-          : (index === 1)
-          ? '<i class="fas fa-crown" style="color: silver;"></i>'
-          : (index === 2)
-          ? '<i class="fas fa-crown" style="color: peru;"></i>'
-          : index + 1;
-
-        const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${student.image}`;
-
-        row.innerHTML = `
-          <td>${rankIcon}</td>
-          <td><img src="${imageUrl}" class="avatar-lg" /></td>
-          <td>${student.name}</td>
-          <td>${student.totalPoints}</td>
-        `;
-
-        leaderboardBody.appendChild(row);
-      });
-    }
-
-    await loadStudentsDropdown();
-    await loadLeaderboard();
+    loadStudents();
   </script>
+
 </body>
 </html>
