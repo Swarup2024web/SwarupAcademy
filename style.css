@@ -54,8 +54,8 @@ h2.page-title {
 }
 
 .student-left img.student-photo {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #2196f3;
@@ -76,11 +76,6 @@ h2.page-title {
   animation: glow 1.5s infinite alternate;
 }
 
-@keyframes glow {
-  0% { box-shadow: 0 0 5px orange; }
-  100% { box-shadow: 0 0 15px red; }
-}
-
 /* NAVIGATION */
 .nav {
   display: flex;
@@ -99,6 +94,59 @@ h2.page-title {
 .nav a:hover {
   transform: scale(1.2);
   color: #ff5722;
+}
+
+/* FIRE ANIMATION */
+@keyframes flicker {
+  0%, 100% { opacity: 1; transform: scale(1) rotate(0); }
+  50% { opacity: 0.7; transform: scale(1.2) rotate(5deg); }
+}
+
+@keyframes burnUp {
+  0% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-2px); opacity: 0.8; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fireGlow {
+  0% { text-shadow: 0 0 3px orange; }
+  50% { text-shadow: 0 0 10px red; }
+  100% { text-shadow: 0 0 3px orange; }
+}
+
+.gift-fire i,
+.task-card .gift-fire i,
+.leaderboard-fire i {
+  animation: flicker 1s infinite ease-in-out, fireGlow 1.4s infinite ease-in-out, burnUp 2s infinite ease-in-out;
+  color: orangered;
+  font-size: 18px;
+  position: absolute;
+  top: 8px;
+  left: 10px;
+}
+
+/* ANIMATED CROWN */
+@keyframes crownSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(5deg) scale(1.2); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.rank-icon {
+  animation: crownSpin 2s infinite ease-in-out;
+  font-size: 20px;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.rank-icon.gold {
+  color: gold;
+}
+.rank-icon.silver {
+  color: silver;
+}
+.rank-icon.bronze {
+  color: #cd7f32;
 }
 
 /* GIFTS */
@@ -156,21 +204,6 @@ h2.page-title {
   background: #388e3c;
 }
 
-/* FIRE ICON */
-.gift-fire {
-  position: absolute;
-  top: 6px;
-  left: 8px;
-  font-size: 18px;
-  color: red;
-  animation: flicker 1s infinite;
-}
-
-@keyframes flicker {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.2); }
-}
-
 /* TASKS */
 .task-grid {
   display: grid;
@@ -217,11 +250,6 @@ h2.page-title {
   display: inline-block;
 }
 
-.task-card .gift-fire {
-  top: 5px;
-  left: 6px;
-}
-
 /* LEADERBOARD */
 .leaderboard-table {
   width: 100%;
@@ -230,6 +258,7 @@ h2.page-title {
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .leaderboard-table th,
@@ -237,6 +266,7 @@ h2.page-title {
   padding: 10px;
   text-align: center;
   border-bottom: 1px solid #e0e0e0;
+  font-size: 15px;
 }
 
 .leaderboard-table th {
@@ -245,8 +275,8 @@ h2.page-title {
 }
 
 .leaderboard-table img {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -270,4 +300,4 @@ h2.page-title {
     width: 100%;
     height: auto;
   }
-}
+  }
