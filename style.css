@@ -125,7 +125,7 @@ h2.page-title {
   left: 10px;
 }
 
-/* ANIMATED CROWN */
+/* CROWN ANIMATION */
 @keyframes crownSpin {
   0% { transform: rotate(0deg) scale(1); }
   50% { transform: rotate(5deg) scale(1.2); }
@@ -300,4 +300,4 @@ h2.page-title {
     width: 100%;
     height: auto;
   }
-  }
+}
