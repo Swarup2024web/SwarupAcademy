@@ -1,34 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Leaderboard</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://kit.fontawesome.com/a2d5df8e9e.js" crossorigin="anonymous"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
-  <script type="module" src="firebaseConfig.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
 
   <!-- HEADER -->
   <div class="header">
-    <!-- Row 1: Dropdown login -->
+    <!-- Row 1: Login Dropdown -->
     <div class="login">
-      <select id="studentDropdown" onchange="loginStudent(this.value)">
-        <option value="">🔓 Select Student</option>
+      <select id="studentSelect">
+        <option value="">👤 Select Student</option>
       </select>
     </div>
 
-    <!-- Row 2: Student Info (hidden initially) -->
-    <div class="student-info" id="studentInfo" style="display: none;">
-      <div class="student-left">
-        <img src="" alt="Student" class="student-photo" id="studentPhoto">
-        <strong id="studentName">Student</strong>
-      </div>
-      <div class="student-stats">
-        <span id="studentPoints">0 pts</span>
-      </div>
+    <!-- Row 2: Student Info -->
+    <div class="student-info">
+      <div class="student-left" id="studentLeft"></div>
+      <div class="student-right" id="studentRight"></div>
     </div>
 
     <!-- Row 3: Navigation -->
@@ -39,9 +32,9 @@
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN -->
   <div class="container">
-    <h2 class="page-title">🏆 Leaderboard</h2>
+    <h2 class="page-title"><i class="fas fa-ranking-star"></i> Top Performers</h2>
     <table class="leaderboard-table" id="leaderboardTable">
       <thead>
         <tr>
@@ -51,42 +44,98 @@
           <th>Total Points</th>
         </tr>
       </thead>
-      <tbody id="leaderboardBody">
-        <!-- Populated via JS -->
-      </tbody>
+      <tbody id="leaderboardBody"></tbody>
     </table>
   </div>
 
   <!-- SCRIPT -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, doc, getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { firebaseConfig } from "./firebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const dropdown = document.getElementById("studentDropdown");
-    const studentInfo = document.getElementById("studentInfo");
-    const studentPhoto = document.getElementById("studentPhoto");
-    const studentName = document.getElementById("studentName");
-    const studentPoints = document.getElementById("studentPoints");
+    const studentSelect = document.getElementById("studentSelect");
+    const studentLeft = document.getElementById("studentLeft");
+    const studentRight = document.getElementById("studentRight");
+    const leaderboardBody = document.getElementById("leaderboardBody");
 
     let students = [];
+    let currentStudentId = null;
+    let currentStudentData = null;
 
-    function renderLeaderboard() {
-      const tbody = document.getElementById("leaderboardBody");
-      tbody.innerHTML = "";
+    function calculateLevel(points) {
+      if (points >= 800) return 3;
+      if (points >= 500) return 2;
+      if (points >= 100) return 1;
+      return 0;
+    }
 
-      students.sort((a, b) => {
-        if (b.totalPoints === a.totalPoints) {
-          return a.name.localeCompare(b.name);
-        }
-        return b.totalPoints - a.totalPoints;
+    async function loadStudentsDropdown() {
+      const snap = await getDocs(collection(db, "students"));
+      students = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      // Fill dropdown
+      students.forEach(s => {
+        const option = document.createElement("option");
+        option.value = s.id;
+        option.textContent = s.name;
+        studentSelect.appendChild(option);
       });
 
-      students.forEach((student, index) => {
+      const savedID = localStorage.getItem("studentID");
+      if (savedID) {
+        studentSelect.value = savedID;
+        await loadStudentInfo(savedID);
+      }
+
+      renderLeaderboard();
+    }
+
+    studentSelect.addEventListener("change", async () => {
+      const id = studentSelect.value;
+      if (!id) return;
+      localStorage.setItem("studentID", id);
+      await loadStudentInfo(id);
+    });
+
+    async function loadStudentInfo(id) {
+      const ref = doc(db, "students", id);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return;
+
+      currentStudentData = snap.data();
+      currentStudentId = id;
+
+      const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${currentStudentData.image}`;
+      const level = calculateLevel(currentStudentData.totalPoints);
+      const pointsLeft = currentStudentData.totalPoints - currentStudentData.pointsSpent;
+
+      studentLeft.innerHTML = `
+        <img src="${imageUrl}" class="student-photo" />
+        <span>${currentStudentData.name}</span>
+        <div class="student-stats"><i class="fas fa-coins"></i> ${pointsLeft}</div>
+        <div class="student-stats fire"><i class="fas fa-fire"></i> Level ${level}</div>
+      `;
+      studentRight.innerHTML = "";
+    }
+
+    function renderLeaderboard() {
+      leaderboardBody.innerHTML = "";
+
+      students.sort((a, b) => {
+        if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+        return a.name.localeCompare(b.name);
+      });
+
+      students.forEach((s, index) => {
         const tr = document.createElement("tr");
+
+        const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${s.image}`;
 
         let crown = "";
         if (index === 0) crown = '<i class="fas fa-crown rank-icon gold"></i>';
@@ -95,41 +144,16 @@
 
         tr.innerHTML = `
           <td>${crown || index + 1}</td>
-          <td><img src="https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${student.image}" /></td>
-          <td>${student.name}</td>
-          <td>${student.totalPoints}</td>
+          <td><img src="${imageUrl}" class="student-photo" /></td>
+          <td>${s.name}</td>
+          <td>${s.totalPoints}</td>
         `;
-        tbody.appendChild(tr);
+
+        leaderboardBody.appendChild(tr);
       });
     }
 
-    function loginStudent(name) {
-      const selected = students.find(s => s.name === name);
-      if (selected) {
-        studentInfo.style.display = "flex";
-        studentPhoto.src = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${selected.image}`;
-        studentName.textContent = selected.name;
-        studentPoints.textContent = `${selected.totalPoints - selected.pointsSpent} pts`;
-      }
-    }
-
-    async function loadStudents() {
-      const snapshot = await getDocs(collection(db, "students"));
-      students = snapshot.docs.map(doc => doc.data());
-
-      // Fill dropdown
-      students.forEach(s => {
-        const option = document.createElement("option");
-        option.value = s.name;
-        option.textContent = s.name;
-        dropdown.appendChild(option);
-      });
-
-      renderLeaderboard();
-    }
-
-    loadStudents();
+    await loadStudentsDropdown();
   </script>
-
 </body>
 </html>
