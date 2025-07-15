@@ -5,38 +5,40 @@
   <title>Gifts</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
 
-  <!-- 🔼 HEADER -->
+  <!-- HEADER -->
   <div class="header">
-    <!-- Row 1: Dropdown Login -->
+    <!-- Row 1: Login Dropdown -->
     <div class="login">
       <select id="studentSelect">
         <option value="">👤 Select Student</option>
       </select>
     </div>
 
-    <!-- Row 2: Points & Level -->
-    <div class="status" id="studentStatus">
-      Select a student to view points and level.
+    <!-- Row 2: Student Info -->
+    <div class="student-info">
+      <div class="student-left" id="studentLeft"></div>
+      <div class="student-right" id="studentRight"></div>
     </div>
 
     <!-- Row 3: Navigation -->
     <div class="nav">
-      <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="tasks.html" title="Tasks">📋</a>
-      <a href="gifts.html" title="Gifts">🎁</a>
+      <a href="leaderboard.html" title="Leaderboard"><i class="fas fa-trophy"></i></a>
+      <a href="tasks.html" title="Tasks"><i class="fas fa-tasks"></i></a>
+      <a href="gifts.html" title="Gifts"><i class="fas fa-gift"></i></a>
     </div>
   </div>
 
-  <!-- 🎁 Gifts Grid -->
+  <!-- GIFTS GRID -->
   <div class="container">
-    <h2 class="page-title">Available Gifts</h2>
-    <div id="giftGrid" class="gift-grid"></div>
+    <h2 class="page-title"><i class="fas fa-gift"></i> Available Gifts</h2>
+    <div class="gift-grid" id="giftGrid"></div>
   </div>
 
-  <!-- 🔌 Firebase Logic -->
+  <!-- SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -47,9 +49,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const studentSelect = document.getElementById("studentSelect");
-    const studentStatus = document.getElementById("studentStatus");
     const giftGrid = document.getElementById("giftGrid");
+    const studentSelect = document.getElementById("studentSelect");
+    const studentLeft = document.getElementById("studentLeft");
+    const studentRight = document.getElementById("studentRight");
 
     let currentStudentId = null;
     let currentStudentData = null;
@@ -61,7 +64,7 @@
       return 0;
     }
 
-    async function loadStudents() {
+    async function loadStudentsDropdown() {
       const snap = await getDocs(collection(db, "students"));
       snap.forEach(docSnap => {
         const data = docSnap.data();
@@ -83,6 +86,7 @@
       if (!id) return;
       localStorage.setItem("studentID", id);
       await loadStudentInfo(id);
+      await loadGifts();
     });
 
     async function loadStudentInfo(id) {
@@ -93,49 +97,78 @@
       currentStudentData = snap.data();
       currentStudentId = id;
 
+      const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${currentStudentData.image}`;
       const level = calculateLevel(currentStudentData.totalPoints);
-      const availablePoints = currentStudentData.totalPoints - currentStudentData.pointsSpent;
-      studentStatus.innerHTML = `🎓 <strong>${currentStudentData.name}</strong><br> Points: <strong>${availablePoints}</strong> | Level: <strong>${level}</strong>`;
+      const pointsLeft = currentStudentData.totalPoints - currentStudentData.pointsSpent;
 
-      loadGifts();
+      studentLeft.innerHTML = `
+        <img src="${imageUrl}" class="student-photo" />
+        <span>${currentStudentData.name}</span>
+        <div class="student-stats"><i class="fas fa-coins"></i> ${pointsLeft}</div>
+        <div class="student-stats fire"><i class="fas fa-fire"></i> Level ${level}</div>
+      `;
+      studentRight.innerHTML = "";
     }
 
     async function loadGifts() {
       const snap = await getDocs(collection(db, "gifts"));
-      giftGrid.innerHTML = "";
+      let gifts = [];
 
       snap.forEach(docSnap => {
-        const gift = docSnap.data();
-        const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${gift.image}`;
-        const pointsLeft = currentStudentData.totalPoints - currentStudentData.pointsSpent;
-        const canRedeem = pointsLeft >= gift.cost;
+        const data = docSnap.data();
+        gifts.push({ ...data, id: docSnap.id });
+      });
 
+      // Sort: cost DESC, then name ASC
+      gifts.sort((a, b) => {
+        if (b.cost !== a.cost) return b.cost - a.cost;
+        return a.name.localeCompare(b.name);
+      });
+
+      giftGrid.innerHTML = "";
+
+      gifts.forEach(gift => {
         const card = document.createElement("div");
         card.className = "gift-card";
-        card.innerHTML = `
-          <img src="${imageUrl}" class="gift-img" alt="${gift.name}" />
-          <h3>${gift.name}</h3>
-          <div class="gift-points">💠 ${gift.cost} pts</div>
-          <button class="redeem-btn" ${!canRedeem ? 'disabled' : ''}>Redeem</button>
-        `;
 
-        const btn = card.querySelector("button");
-        btn.addEventListener("click", async () => {
-          if (!canRedeem) return;
-          const ref = doc(db, "students", currentStudentId);
-          await updateDoc(ref, {
-            pointsSpent: currentStudentData.pointsSpent + gift.cost
-          });
-          alert(`🎉 "${gift.name}" redeemed! Collect it from your teacher.`);
-          await loadStudentInfo(currentStudentId);
-        });
+        const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${gift.image}`;
+        const pointsLeft = currentStudentData
+          ? currentStudentData.totalPoints - currentStudentData.pointsSpent
+          : 0;
+        const canRedeem = currentStudentData && pointsLeft >= gift.cost;
+
+        card.innerHTML = `
+          ${gift.cost > 1000 ? '<div class="gift-fire"><i class="fas fa-fire"></i></div>' : ''}
+          <img src="${imageUrl}" class="gift-img" />
+          <div class="gift-name">${gift.name}</div>
+          <div class="gift-cost"><i class="fas fa-coins"></i> ${gift.cost} pts</div>
+          ${
+            canRedeem
+              ? `<button class="redeem-btn" onclick="redeemGift('${gift.id}', ${gift.cost})">Redeem</button>`
+              : ''
+          }
+        `;
 
         giftGrid.appendChild(card);
       });
     }
 
-    await loadStudents();
-  </script>
+    window.redeemGift = async (giftId, cost) => {
+      if (!currentStudentId || !currentStudentData) return;
+      const confirmRedeem = confirm("Are you sure you want to redeem this gift?");
+      if (!confirmRedeem) return;
 
+      const studentRef = doc(db, "students", currentStudentId);
+      const updatedSpent = currentStudentData.pointsSpent + cost;
+      await updateDoc(studentRef, { pointsSpent: updatedSpent });
+
+      alert("Redeemed successfully! Collect from teacher.");
+      await loadStudentInfo(currentStudentId);
+      await loadGifts();
+    };
+
+    await loadStudentsDropdown();
+    await loadGifts();
+  </script>
 </body>
 </html>
