@@ -13,22 +13,21 @@
 
   <!-- HEADER -->
   <div class="header">
-    <!-- Row 1: Login Dropdown -->
+    <!-- Row 1: Dropdown login -->
     <div class="login">
       <select id="studentDropdown" onchange="loginStudent(this.value)">
         <option value="">🔓 Select Student</option>
       </select>
     </div>
 
-    <!-- Row 2: Student Info -->
+    <!-- Row 2: Student Info (hidden initially) -->
     <div class="student-info" id="studentInfo" style="display: none;">
       <div class="student-left">
         <img src="" alt="Student" class="student-photo" id="studentPhoto">
-        <strong id="studentName">Name</strong>
+        <strong id="studentName">Student</strong>
       </div>
       <div class="student-stats">
-        <span id="studentPoints">0 pts</span> |
-        <span id="studentLevel">Level 1</span>
+        <span id="studentPoints">0 pts</span>
       </div>
     </div>
 
@@ -40,7 +39,7 @@
     </div>
   </div>
 
-  <!-- MAIN -->
+  <!-- MAIN CONTENT -->
   <div class="container">
     <h2 class="page-title">🏆 Leaderboard</h2>
     <table class="leaderboard-table" id="leaderboardTable">
@@ -50,11 +49,10 @@
           <th>Image</th>
           <th>Name</th>
           <th>Total Points</th>
-          <th>Level</th>
         </tr>
       </thead>
       <tbody id="leaderboardBody">
-        <!-- JS injects here -->
+        <!-- Populated via JS -->
       </tbody>
     </table>
   </div>
@@ -73,16 +71,8 @@
     const studentPhoto = document.getElementById("studentPhoto");
     const studentName = document.getElementById("studentName");
     const studentPoints = document.getElementById("studentPoints");
-    const studentLevel = document.getElementById("studentLevel");
 
     let students = [];
-
-    function calculateLevel(points) {
-      if (points >= 800) return 3;
-      if (points >= 500) return 2;
-      if (points >= 100) return 1;
-      return 0;
-    }
 
     function renderLeaderboard() {
       const tbody = document.getElementById("leaderboardBody");
@@ -98,7 +88,6 @@
       students.forEach((student, index) => {
         const tr = document.createElement("tr");
 
-        // Crown for Top 3
         let crown = "";
         if (index === 0) crown = '<i class="fas fa-crown rank-icon gold"></i>';
         else if (index === 1) crown = '<i class="fas fa-crown rank-icon silver"></i>';
@@ -109,7 +98,6 @@
           <td><img src="https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${student.image}" /></td>
           <td>${student.name}</td>
           <td>${student.totalPoints}</td>
-          <td>Level ${calculateLevel(student.totalPoints)}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -122,7 +110,6 @@
         studentPhoto.src = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${selected.image}`;
         studentName.textContent = selected.name;
         studentPoints.textContent = `${selected.totalPoints - selected.pointsSpent} pts`;
-        studentLevel.textContent = `Level ${calculateLevel(selected.totalPoints)}`;
       }
     }
 
