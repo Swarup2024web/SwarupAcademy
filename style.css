@@ -1,40 +1,28 @@
-/* GLOBAL STYLES */
+/* RESET & BASE */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to bottom right, #e0f7ff, #cceeff);
+  background: linear-gradient(to bottom right, #e3f2fd, #bbdefb);
   color: #333;
-}
-
-h2.page-title {
-  text-align: center;
-  margin: 20px 0;
-  color: #0b6fa4;
-  font-size: 26px;
-}
-
-.container {
-  padding: 1rem;
 }
 
 /* HEADER */
 .header {
   background: linear-gradient(to right, #b3e5fc, #81d4fa);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  padding-bottom: 0.5rem;
+  padding-bottom: 10px;
 }
 
-/* Row 1: Dropdown */
+/* Row 1: Login Dropdown */
 .login {
   text-align: center;
   padding: 10px;
 }
-
 .login select {
   padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+  border-radius: 12px;
   font-size: 16px;
+  border: 1px solid #ccc;
   background: #fff;
 }
 
@@ -43,9 +31,9 @@ h2.page-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
   gap: 15px;
-  margin-bottom: 10px;
+  margin: 10px auto;
+  flex-wrap: wrap;
 }
 
 .student-left {
@@ -54,7 +42,7 @@ h2.page-title {
   gap: 10px;
 }
 
-.student-left img.student-photo {
+.student-photo {
   width: 45px;
   height: 45px;
   border-radius: 50%;
@@ -70,10 +58,11 @@ h2.page-title {
   color: #00796b;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  font-weight: bold;
 }
 
-/* Row 3: Navigation */
+/* Row 3: Navigation Tabs */
 .nav {
   display: flex;
   justify-content: space-around;
@@ -81,56 +70,60 @@ h2.page-title {
   padding: 12px 0;
   border-top: 1px solid #90caf9;
 }
-
 .nav a {
   color: #0d47a1;
   font-size: 22px;
   transition: transform 0.3s ease;
 }
-
 .nav a:hover {
   transform: scale(1.2);
   color: #ff5722;
 }
 
+/* PAGE TITLES */
+.page-title {
+  text-align: center;
+  margin: 20px 0;
+  color: #0b6fa4;
+  font-size: 26px;
+}
+
+/* CROWNS */
+.rank-icon {
+  animation: crownSpin 2s infinite ease-in-out;
+  font-size: 20px;
+}
+.rank-icon.gold { color: gold; }
+.rank-icon.silver { color: silver; }
+.rank-icon.bronze { color: #cd7f32; }
+
+@keyframes crownSpin {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(10deg) scale(1.3); }
+}
+
 /* FIRE ANIMATION */
+.fire-icon, .gift-fire i, .student-stats.fire i {
+  animation: flicker 1s infinite ease-in-out, glow 2s infinite ease-in-out;
+  color: orangered;
+}
 @keyframes flicker {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.7; transform: scale(1.2); }
 }
 @keyframes glow {
-  0%, 100% { text-shadow: 0 0 3px orange; }
-  50% { text-shadow: 0 0 10px red; }
+  0%, 100% { text-shadow: 0 0 5px orange; }
+  50% { text-shadow: 0 0 12px red; }
 }
 
-.fire-icon {
-  animation: flicker 1s infinite ease-in-out, glow 2s infinite ease-in-out;
-  color: orangered;
-  font-size: 18px;
+.gift-fire {
   position: absolute;
-  top: 8px;
-  left: 10px;
+  top: 6px;
+  left: 8px;
+  font-size: 18px;
 }
 
-/* CROWN ANIMATION */
-@keyframes crownSpin {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(5deg) scale(1.2); }
-  100% { transform: rotate(0deg) scale(1); }
-}
-
-.rank-icon {
-  animation: crownSpin 2s infinite ease-in-out;
-  font-size: 20px;
-  display: inline-block;
-  margin-right: 5px;
-}
-
-.rank-icon.gold { color: gold; }
-.rank-icon.silver { color: silver; }
-.rank-icon.bronze { color: #cd7f32; }
-
-/* LEADERBOARD */
+/* LEADERBOARD TABLE */
 .leaderboard-table {
   width: 100%;
   border-collapse: collapse;
@@ -161,76 +154,25 @@ h2.page-title {
   object-fit: cover;
 }
 
-/* GIFTS PAGE */
-.gift-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+/* CONTAINERS */
+.container {
+  padding: 20px;
 }
 
-.gift-card {
-  background: #ffffff;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  padding: 1rem;
-  text-align: center;
-  position: relative;
-}
-
-.gift-card img.gift-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 12px;
-  object-fit: cover;
-  margin-bottom: 10px;
-}
-
-.gift-name {
-  font-weight: bold;
-  font-size: 18px;
-  margin-bottom: 6px;
-}
-
-.gift-cost {
-  background: #f1f8e9;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  color: #558b2f;
-  display: inline-block;
-  margin-bottom: 10px;
-}
-
-.redeem-btn {
-  padding: 8px 16px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.redeem-btn:hover {
-  background: #388e3c;
-}
-
-/* TASKS PAGE */
+/* TASK CARDS */
 .task-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 16px;
 }
-
 .task-card {
   display: flex;
+  align-items: center;
   background: #ffffff;
   border-radius: 15px;
   padding: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   position: relative;
-  align-items: center;
   gap: 12px;
 }
 
@@ -254,13 +196,67 @@ h2.page-title {
 }
 
 .task-points {
-  background: #e1f5fe;
-  color: #0277bd;
+  background: #fff9c4;
+  color: #f57f17;
   padding: 5px 10px;
   border-radius: 12px;
   font-size: 14px;
   display: inline-block;
   font-weight: bold;
+}
+
+/* GIFTS */
+.gift-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.gift-card {
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 1rem;
+  text-align: center;
+  position: relative;
+}
+
+.gift-card img.gift-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 15px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.gift-name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.gift-cost {
+  background: #e8f5e9;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #388e3c;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.redeem-btn {
+  padding: 8px 16px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.redeem-btn:hover {
+  background: #388e3c;
 }
 
 /* RESPONSIVE */
@@ -297,4 +293,4 @@ h2.page-title {
     width: 80px;
     height: 80px;
   }
-  }
+}
