@@ -1,274 +1,223 @@
-/* Base Reset */
+/* Reset */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-body {
+  box-sizing: border-box;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #fff0f5;
-  color: #333;
-  line-height: 1.5;
 }
 
-/* Header Section */
-.header {
-  background: linear-gradient(to right, #f8bbd0, #ffe0f0);
-  padding: 10px;
-  box-shadow: 0 2px 4px #ccc;
+/* Body */
+body {
+  background: linear-gradient(to right, #e0f7fa, #cceeff);
+  min-height: 100vh;
+  color: #0a2540;
 }
 
-/* Row 1: Login Dropdown */
-.login {
-  text-align: center;
-  margin-bottom: 6px;
-}
-
-.login select {
-  padding: 8px;
-  font-size: 16px;
-  border: 2px solid #f06292;
-  border-radius: 20px;
-  background-color: #fff;
-  color: #333;
-  width: 80%;
-  max-width: 300px;
-}
-
-/* Row 2: Status */
-.status {
-  text-align: center;
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #ad1457;
-}
-
-/* Row 3: Navigation Icons */
-.nav {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  font-size: 22px;
-  padding: 10px 0;
-  background-color: #fce4ec;
-  border-top: 1px solid #f8bbd0;
-  border-bottom: 1px solid #f8bbd0;
-}
-
-.nav a {
-  color: #c2185b;
-  text-decoration: none;
-  transition: transform 0.2s;
-}
-
-.nav a:hover {
-  transform: scale(1.2);
-}
-
-/* Container & Page Title */
+/* Container */
 .container {
+  padding: 1rem;
   max-width: 1000px;
-  margin: 20px auto;
-  padding: 10px;
+  margin: auto;
 }
 
+/* Page Title */
 .page-title {
   text-align: center;
-  color: #c2185b;
-  margin-bottom: 20px;
-  font-size: 24px;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #007acc;
+}
+
+/* Header */
+.header {
+  background: #ffffffcc;
+  backdrop-filter: blur(6px);
+  border-bottom: 2px solid #c0e4ff;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 180, 255, 0.1);
+  margin-bottom: 10px;
+}
+
+/* Row 1: Dropdown Login */
+.login select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #00bfff;
+  border-radius: 12px;
+  background: #f0faff;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.3s;
+}
+.login select:hover {
+  background-color: #e0f7ff;
+}
+
+/* Row 2: Student Info */
+.student-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding: 8px 0;
+  border-top: 1px solid #d0efff;
+  border-bottom: 1px solid #d0efff;
+}
+
+.student-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.student-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #00c0ff;
+}
+
+.student-right {
+  font-size: 0.95rem;
+  color: #006bb3;
+}
+
+/* Row 3: Navigation */
+.nav {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  border-top: 1px solid #b8e6ff;
+  padding-top: 10px;
+}
+.nav a {
+  font-size: 1.4rem;
+  color: #0099cc;
+  transition: 0.3s;
+}
+.nav a:hover {
+  color: #005580;
 }
 
 /* Leaderboard Table */
 table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
+  background: #ffffffaa;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 200, 255, 0.1);
 }
-
-thead {
-  background-color: #f8bbd0;
-  color: #880e4f;
-}
-
 th, td {
   padding: 12px;
   text-align: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #d0efff;
 }
-
-tr:hover {
-  background-color: #fce4ec;
+thead {
+  background: linear-gradient(to right, #ccefff, #b3e5fc);
 }
-
-.avatar {
-  width: 40px;
-  height: 40px;
+tbody tr:hover {
+  background: #f1faff;
+}
+.avatar-lg {
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #f48fb1;
+  border: 2px solid #00b3ff;
 }
 
-/* Task Cards */
-.task-grid {
+/* Cards Layout (Tasks + Gifts) */
+.task-grid, .gift-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 15px;
 }
 
-.task-card {
-  background: #fff;
-  border: 2px solid #f8bbd0;
-  border-radius: 16px;
-  text-align: center;
-  padding: 16px;
-  box-shadow: 0 2px 10px rgba(255, 105, 180, 0.15);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.task-img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  margin-bottom: 10px;
-  border-radius: 16px;
-  box-shadow: 0 0 6px rgba(0,0,0,0.1);
-}
-
-.task-card h3 {
-  font-size: 16px;
-  color: #880e4f;
-  margin-bottom: 8px;
-}
-
-.task-points {
-  font-size: 14px;
-  color: white;
-  font-weight: bold;
-  padding: 6px 12px;
+.task-card, .gift-card {
+  background: linear-gradient(to bottom right, #e0f7ff, #ffffff);
   border-radius: 20px;
-  background: linear-gradient(to right, #f06292, #f48fb1);
-  box-shadow: 0 2px 6px rgba(255, 105, 180, 0.3);
-}
-
-/* Gift Cards */
-.gift-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-.gift-card {
-  background-color: #fff;
-  border: 2px solid #f8bbd0;
-  border-radius: 16px;
-  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0, 170, 255, 0.1);
+  padding: 15px;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(255, 105, 180, 0.15);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  transition: transform 0.3s ease;
+}
+.task-card:hover, .gift-card:hover {
+  transform: translateY(-4px);
 }
 
-.gift-img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
+.task-img, .gift-img {
+  width: 80%;
+  height: auto;
+  border-radius: 15px;
   margin-bottom: 10px;
-  border-radius: 12px;
-  display: block;
+  box-shadow: 0 2px 5px rgba(0, 160, 255, 0.15);
 }
 
-.gift-card h3 {
-  margin: 5px 0;
-  font-size: 16px;
-  color: #880e4f;
-}
-
-.gift-points {
-  background-color: #f8bbd0;
-  color: #880e4f;
-  padding: 6px 12px;
-  font-weight: bold;
-  font-size: 14px;
-  border-radius: 30px;
-  margin: 8px 0;
-}
-
-.redeem-btn {
-  background-color: #f06292;
-  color: white;
+/* Points Display (Tasks & Gifts) */
+.task-points, .gift-points {
+  background: #dff9ff;
+  color: #007acc;
   padding: 6px 14px;
-  font-size: 14px;
+  border-radius: 25px;
+  display: inline-block;
+  margin: 8px auto;
+  font-weight: bold;
+  animation: glow 2s infinite;
+  border: 2px solid transparent;
+}
+@keyframes glow {
+  0% { border-color: #80dfff; }
+  50% { border-color: #00ccff; }
+  100% { border-color: #80dfff; }
+}
+
+/* Buttons */
+button {
+  padding: 8px 14px;
   border: none;
-  border-radius: 30px;
+  border-radius: 25px;
+  background: #00bfff;
+  color: white;
+  font-weight: bold;
   cursor: pointer;
   transition: background 0.3s;
 }
-
-.redeem-btn:hover {
-  background-color: #c2185b;
+button:hover {
+  background: #0099cc;
 }
-
-.redeem-btn:disabled {
-  background-color: #ddd;
-  color: #999;
+button:disabled {
+  background: #cdefff;
+  color: #666;
   cursor: not-allowed;
 }
 
-/* Mobile Responsive */
+/* Responsive Adjustments */
 @media (max-width: 600px) {
-  .nav {
-    gap: 20px;
-    font-size: 20px;
+  .student-info {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
   }
 
-  .login select {
-    width: 90%;
-    font-size: 14px;
+  .task-grid, .gift-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .status {
-    font-size: 14px;
+  table {
+    font-size: 0.95rem;
   }
 
-  .page-title {
-    font-size: 20px;
+  .avatar-lg {
+    width: 45px;
+    height: 45px;
   }
 
-  .avatar {
-    width: 30px;
-    height: 30px;
+  .student-photo {
+    width: 35px;
+    height: 35px;
   }
-
-  .task-img, .gift-img {
-    width: 80px;
-    height: 80px;
-  }
-
-  .task-card h3,
-  .gift-card h3 {
-    font-size: 15px;
-  }
-
-  .task-points,
-  .gift-points,
-  .redeem-btn {
-    font-size: 13px;
-    padding: 6px 10px;
-  }
-
-  .task-grid,
-  .gift-grid {
-    grid-template-columns: repeat(2, 1fr); /* Keep 2 on mobile too */
-  }
-  }
+      }
