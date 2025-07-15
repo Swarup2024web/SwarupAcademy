@@ -9,7 +9,7 @@
 </head>
 <body>
 
-  <!-- 🧠 HEADER -->
+  <!-- HEADER -->
   <div class="header">
     <!-- Row 1: Login Dropdown -->
     <div class="login">
@@ -18,14 +18,10 @@
       </select>
     </div>
 
-    <!-- Row 2: Student Info (Image + Name | Points + Level) -->
+    <!-- Row 2: Student Info -->
     <div class="student-info">
-      <div class="student-left" id="studentLeft">
-        <!-- Image + Name will load here -->
-      </div>
-      <div class="student-right" id="studentRight">
-        <!-- Points and Level -->
-      </div>
+      <div class="student-left" id="studentLeft"></div>
+      <div class="student-right" id="studentRight"></div>
     </div>
 
     <!-- Row 3: Navigation -->
@@ -36,9 +32,9 @@
     </div>
   </div>
 
-  <!-- 🏆 LEADERBOARD -->
+  <!-- LEADERBOARD SECTION -->
   <div class="container">
-    <h2 class="page-title">🏆 Top Students</h2>
+    <h2 class="page-title"><i class="fas fa-trophy"></i> Top Students</h2>
     <table>
       <thead>
         <tr>
@@ -52,7 +48,7 @@
     </table>
   </div>
 
-  <!-- 🔌 Firebase + Script -->
+  <!-- SCRIPTS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -117,11 +113,10 @@
       studentLeft.innerHTML = `
         <img src="${imageUrl}" class="student-photo" />
         <span>${currentStudentData.name}</span>
+        <div class="student-stats"><i class="fas fa-coins"></i> ${pointsLeft}</div>
+        <div class="student-stats fire"><i class="fas fa-fire"></i> Level ${level}</div>
       `;
-      studentRight.innerHTML = `
-        Points: <strong>${pointsLeft}</strong> |
-        Level: <strong>${level}</strong>
-      `;
+      studentRight.innerHTML = "";
     }
 
     async function loadLeaderboard() {
@@ -137,7 +132,7 @@
         });
       });
 
-      // Sort by totalPoints DESC, then name ASC
+      // Sort by points DESC, name ASC
       students.sort((a, b) => {
         if (b.totalPoints !== a.totalPoints)
           return b.totalPoints - a.totalPoints;
