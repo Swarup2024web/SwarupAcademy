@@ -5,48 +5,54 @@
   <title>Leaderboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
 
-  <!-- 🔼 HEADER WITH 3 ROWS -->
+  <!-- 🧠 HEADER -->
   <div class="header">
-    <!-- Row 1: Dropdown for student login -->
+    <!-- Row 1: Login Dropdown -->
     <div class="login">
       <select id="studentSelect">
         <option value="">👤 Select Student</option>
       </select>
     </div>
 
-    <!-- Row 2: Points & Level -->
-    <div class="status" id="studentStatus">
-      Select a student to view points and level.
+    <!-- Row 2: Student Info (Image + Name | Points + Level) -->
+    <div class="student-info">
+      <div class="student-left" id="studentLeft">
+        <!-- Image + Name will load here -->
+      </div>
+      <div class="student-right" id="studentRight">
+        <!-- Points and Level -->
+      </div>
     </div>
 
-    <!-- Row 3: Navigation Tabs -->
+    <!-- Row 3: Navigation -->
     <div class="nav">
-      <a href="leaderboard.html" title="Leaderboard">🏆</a>
-      <a href="tasks.html" title="Tasks">📋</a>
-      <a href="gifts.html" title="Gifts">🎁</a>
+      <a href="leaderboard.html" title="Leaderboard"><i class="fas fa-trophy"></i></a>
+      <a href="tasks.html" title="Tasks"><i class="fas fa-tasks"></i></a>
+      <a href="gifts.html" title="Gifts"><i class="fas fa-gift"></i></a>
     </div>
   </div>
 
-  <!-- 🏆 Leaderboard Table -->
+  <!-- 🏆 LEADERBOARD -->
   <div class="container">
-    <h2 class="page-title">Top Students</h2>
+    <h2 class="page-title">🏆 Top Students</h2>
     <table>
       <thead>
         <tr>
           <th>Rank</th>
-          <th>Image</th>
+          <th>Photo</th>
           <th>Name</th>
-          <th>Points</th>
+          <th>Total Points</th>
         </tr>
       </thead>
       <tbody id="leaderboardBody"></tbody>
     </table>
   </div>
 
-  <!-- 🔌 Firebase & Logic -->
+  <!-- 🔌 Firebase + Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -58,48 +64,13 @@
     const db = getFirestore(app);
 
     const studentSelect = document.getElementById("studentSelect");
-    const studentStatus = document.getElementById("studentStatus");
     const leaderboardBody = document.getElementById("leaderboardBody");
+    const studentLeft = document.getElementById("studentLeft");
+    const studentRight = document.getElementById("studentRight");
 
-    // 🟢 Load all students into dropdown and table
-    async function loadStudents() {
-      const snap = await getDocs(collection(db, "students"));
-      const students = [];
+    let currentStudentId = null;
+    let currentStudentData = null;
 
-      snap.forEach(doc => {
-        const data = doc.data();
-        students.push({ id: doc.id, ...data });
-
-        const option = document.createElement("option");
-        option.value = doc.id;
-        option.textContent = data.name;
-        studentSelect.appendChild(option);
-      });
-
-      // Preselect if saved in storage
-      const savedID = localStorage.getItem("studentID");
-      if (savedID) {
-        studentSelect.value = savedID;
-        loadStudentInfo(savedID);
-      }
-
-      // Sort and show leaderboard
-      students.sort((a, b) => b.totalPoints - a.totalPoints);
-      leaderboardBody.innerHTML = "";
-      students.forEach((s, index) => {
-        const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${s.image}`;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${index + 1}</td>
-          <td><img src="${imageUrl}" alt="${s.name}" class="avatar" /></td>
-          <td>${s.name}</td>
-          <td>${s.totalPoints}</td>
-        `;
-        leaderboardBody.appendChild(tr);
-      });
-    }
-
-    // 🧠 Calculate Level by totalPoints
     function calculateLevel(points) {
       if (points >= 800) return 3;
       if (points >= 500) return 2;
@@ -107,27 +78,100 @@
       return 0;
     }
 
-    // 🔁 Update student header info
+    async function loadStudentsDropdown() {
+      const snap = await getDocs(collection(db, "students"));
+      snap.forEach(docSnap => {
+        const data = docSnap.data();
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = data.name;
+        studentSelect.appendChild(option);
+      });
+
+      const savedID = localStorage.getItem("studentID");
+      if (savedID) {
+        studentSelect.value = savedID;
+        await loadStudentInfo(savedID);
+      }
+    }
+
+    studentSelect.addEventListener("change", async () => {
+      const id = studentSelect.value;
+      if (!id) return;
+      localStorage.setItem("studentID", id);
+      await loadStudentInfo(id);
+    });
+
     async function loadStudentInfo(id) {
       const ref = doc(db, "students", id);
       const snap = await getDoc(ref);
       if (!snap.exists()) return;
 
-      const student = snap.data();
-      const level = calculateLevel(student.totalPoints);
-      studentStatus.innerHTML = `🎓 <strong>${student.name}</strong><br>Points: <strong>${student.totalPoints}</strong> | Level: <strong>${level}</strong>`;
+      currentStudentData = snap.data();
+      currentStudentId = id;
+
+      const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${currentStudentData.image}`;
+      const level = calculateLevel(currentStudentData.totalPoints);
+      const pointsLeft = currentStudentData.totalPoints - currentStudentData.pointsSpent;
+
+      studentLeft.innerHTML = `
+        <img src="${imageUrl}" class="student-photo" />
+        <span>${currentStudentData.name}</span>
+      `;
+      studentRight.innerHTML = `
+        Points: <strong>${pointsLeft}</strong> |
+        Level: <strong>${level}</strong>
+      `;
     }
 
-    // 📥 On student dropdown change
-    studentSelect.addEventListener("change", () => {
-      const id = studentSelect.value;
-      if (!id) return;
-      localStorage.setItem("studentID", id);
-      loadStudentInfo(id);
-    });
+    async function loadLeaderboard() {
+      const snap = await getDocs(collection(db, "students"));
+      let students = [];
 
-    loadStudents();
+      snap.forEach(docSnap => {
+        const data = docSnap.data();
+        students.push({
+          name: data.name,
+          totalPoints: data.totalPoints,
+          image: data.image
+        });
+      });
+
+      // Sort by totalPoints DESC, then name ASC
+      students.sort((a, b) => {
+        if (b.totalPoints !== a.totalPoints)
+          return b.totalPoints - a.totalPoints;
+        return a.name.localeCompare(b.name);
+      });
+
+      leaderboardBody.innerHTML = "";
+
+      students.forEach((student, index) => {
+        const row = document.createElement("tr");
+
+        let rankIcon = (index === 0)
+          ? '<i class="fas fa-crown" style="color: gold;"></i>'
+          : (index === 1)
+          ? '<i class="fas fa-crown" style="color: silver;"></i>'
+          : (index === 2)
+          ? '<i class="fas fa-crown" style="color: peru;"></i>'
+          : index + 1;
+
+        const imageUrl = `https://raw.githubusercontent.com/swarup2024web/swarupacademy/main/assets/${student.image}`;
+
+        row.innerHTML = `
+          <td>${rankIcon}</td>
+          <td><img src="${imageUrl}" class="avatar-lg" /></td>
+          <td>${student.name}</td>
+          <td>${student.totalPoints}</td>
+        `;
+
+        leaderboardBody.appendChild(row);
+      });
+    }
+
+    await loadStudentsDropdown();
+    await loadLeaderboard();
   </script>
-
 </body>
 </html>
