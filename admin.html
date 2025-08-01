@@ -217,6 +217,29 @@
     loadStudents();
   };
 
+  window.deductPoints = async function () {
+  const points = parseInt(document.getElementById("deductPoints").value);
+  if (isNaN(points) || points <= 0) return alert("Enter valid points to deduct!");
+
+  const boxes = document.querySelectorAll(".select:checked");
+  if (!boxes.length) return alert("Select at least one student!");
+
+  for (const box of boxes) {
+    const id = box.dataset.id;
+    const student = students.find(s => s.id === id);
+    if (!student) continue;
+
+    const newPoints = Math.max(0, student.totalPoints - points);
+    await updateDoc(doc(db, "students", id), {
+      totalPoints: newPoints
+    });
+  }
+
+  alert("📉 Points deducted!");
+  document.getElementById("deductPoints").value = "";
+  loadStudents();
+};
+  
   window.addStudent = async function () {
     const name = document.getElementById("studentName").value.trim();
     const image = document.getElementById("studentImage").value.trim();
